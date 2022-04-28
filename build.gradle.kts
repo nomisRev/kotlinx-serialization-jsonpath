@@ -1,9 +1,17 @@
-plugins {
-  kotlin("multiplatform") version "1.6.21" apply true
-  id("io.kotest.multiplatform") version "5.2.3" apply true
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+@Suppress("DSL_SCOPE_VIOLATION") plugins {
+  application
+  alias(libs.plugins.kotest.multiplatform)
+  id(libs.plugins.kotlin.multiplatform.pluginId)
+  alias(libs.plugins.arrow.kotlin)
+  alias(libs.plugins.arrow.formatter)
+  alias(libs.plugins.dokka)
+  id(libs.plugins.detekt.pluginId)
+  alias(libs.plugins.kover)
+  alias(libs.plugins.kotlinx.serialization)
 }
 
-group "org.example"
 version "1.0"
 
 repositories {
@@ -13,56 +21,50 @@ repositories {
   }
 }
 
-kotlin {
-  jvm()
+allprojects {
+  extra.set("dokka.outputDirectory", rootDir.resolve("docs"))
+  setupDetekt()
+}
 
-  js(IR) {
-    browser()
-    nodejs()
+tasks {
+  withType<KotlinCompile>().configureEach {
+    kotlinOptions {
+      jvmTarget = "1.8"
+      freeCompilerArgs = freeCompilerArgs + "-Xcontext-receivers"
+    }
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
   }
 
-  linuxX64()
+  test {
+    useJUnitPlatform()
+    extensions.configure(kotlinx.kover.api.KoverTaskExtension::class) {
+      includes = listOf("io.github.nomisrev.*")
+    }
+  }
+}
 
-  mingwX64()
 
-  iosArm32()
-  iosArm64()
-  iosSimulatorArm64()
-  iosX64()
-  macosArm64()
-  macosX64()
-  tvosArm64()
-  tvosSimulatorArm64()
-  tvosX64()
-  watchosArm32()
-  watchosArm64()
-  watchosSimulatorArm64()
-  watchosX64()
-  watchosX86()
-
+kotlin {
   sourceSets {
     commonMain {
       dependencies {
         implementation(kotlin("stdlib-common"))
-        implementation("io.arrow-kt:arrow-core:1.1.2")
-        implementation("io.arrow-kt:arrow-optics:1.1.2")
-        implementation("io.arrow-kt:arrow-fx-coroutines:1.1.2")
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
+        implementation(libs.arrow.optics)
+        implementation(libs.kotlinx.serialization.json)
       }
     }
 
     commonTest {
       dependencies {
-        implementation("io.kotest:kotest-property:5.2.3")
-        implementation("io.kotest:kotest-framework-engine:5.2.3")
-        implementation("io.kotest:kotest-assertions-core:5.2.3")
-        implementation("io.kotest.extensions:kotest-assertions-arrow:1.2.5")
-        implementation("io.kotest.extensions:kotest-property-arrow:1.2.5") // optional
-        implementation("io.kotest.extensions:kotest-property-arrow-optics:1.2.5") // optional
+        implementation(libs.kotest.arrow)
+        implementation(libs.kotest.frameworkEngine)
+        implementation(libs.kotest.assertionsCore)
+        implementation(libs.kotest.property)
       }
     }
 
-    val jvmTest by getting {
+    named("jvmTest") {
       dependencies {
         implementation("io.kotest:kotest-runner-junit5-jvm:5.2.3")
       }
