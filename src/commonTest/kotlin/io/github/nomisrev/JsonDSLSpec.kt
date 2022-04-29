@@ -108,11 +108,11 @@ class JsonDSLSpec : StringSpec({
 //    }
 //  }
 
-  "get from array" {
-    checkAll(Arb.json(Arb.city())) { cityJson ->
-      JsonPath.select("streets")[0]
-        .extract<Street>()
-        .getOrNull(cityJson) shouldBe Json.decodeFromJsonElement<City>(cityJson).streets.getOrNull(0)
-    }
-  }
+//  "get from array" {
+//    checkAll(Arb.json(Arb.city())) { cityJson ->
+//      JsonPath.select("streets")[0]
+//        .extract<Street>()
+//        .getOrNull(cityJson) shouldBe Json.decodeFromJsonElement<City>(cityJson).streets.getOrNull(0)
+//    }
+//  }
 })
