@@ -1,9 +1,17 @@
+import kotlinx.knit.KnitPluginExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.dokka.gradle.DokkaTask
+
+buildscript {
+  dependencies {
+    classpath("org.jetbrains.kotlinx:kotlinx-knit:0.4.0")
+  }
+}
 
 @Suppress("DSL_SCOPE_VIOLATION") plugins {
   application
@@ -15,13 +23,12 @@ import org.gradle.kotlin.dsl.withType
   alias(libs.plugins.kotlinx.serialization)
 }
 
+apply(plugin = "kotlinx-knit")
+
 version "1.0"
 
 repositories {
   mavenCentral()
-  maven {
-    url = uri("https://oss.sonatype.org/content/repositories/snapshots")
-  }
 }
 
 allprojects {
@@ -33,7 +40,6 @@ tasks {
   withType<KotlinCompile>().configureEach {
     kotlinOptions {
       jvmTarget = "1.8"
-      freeCompilerArgs = freeCompilerArgs + "-Xcontext-receivers"
     }
     sourceCompatibility = "1.8"
     targetCompatibility = "1.8"
@@ -86,8 +92,8 @@ kotlin {
     commonMain {
       dependencies {
         implementation(kotlin("stdlib-common"))
-        implementation(libs.arrow.optics)
-        implementation(libs.kotlinx.serialization.json)
+        api(libs.arrow.optics)
+        api(libs.kotlinx.serialization.json)
       }
     }
 
@@ -106,6 +112,62 @@ kotlin {
       }
     }
   }
+}
+
+configure<KnitPluginExtension> {
+  siteRoot = "https://nomisrev.github.io/kotlinx-serialization-jsonpath/"
+}
+
+tasks {
+  withType<DokkaTask>().configureEach {
+    outputDirectory.set(rootDir.resolve("docs"))
+    moduleName.set("kotlin-kafka")
+    dokkaSourceSets {
+      named("commonMain") {
+        includes.from("README.md")
+        perPackageOption {
+          matchingRegex.set(".*\\.internal.*")
+          suppress.set(true)
+        }
+        sourceLink {
+          localDirectory.set(file("src/commonMain/kotlin"))
+          remoteUrl.set(uri("https://github.com/nomisRev/kotlinx-serialization-jsonpath/tree/main/src/commonMain/kotlin").toURL())
+          remoteLineSuffix.set("#L")
+        }
+      }
+    }
+  }
+
+  getByName("knitPrepare").dependsOn(getTasksByName("dokka", true))
+}
+
+
+fun Project.setupDetekt() {
+  plugins.apply("io.gitlab.arturbosch.detekt")
+
+  configure<DetektExtension> {
+    parallel = true
+    buildUponDefaultConfig = true
+    allRules = true
+  }
+
+  tasks.withType<Detekt>().configureEach {
+    exclude { "generated/sqldelight" in it.file.absolutePath }
+    reports {
+      html.required by true
+      sarif.required by true
+      txt.required by false
+      xml.required by false
+    }
+  }
+
+  tasks.configureEach {
+    if (name == "build") dependsOn(tasks.withType<Detekt>())
+  }
+}
+
+infix fun <T> Property<T>.by(value: T) {
+  set(value)
 }
 
 fun Project.setupDetekt() {

@@ -33,3 +33,5 @@ gradleEnterprise {
     termsOfServiceAgree = "yes"
   }
 }
+
+include(":guide")

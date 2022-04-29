@@ -3,15 +3,8 @@
 JsonPath offers a simple DSL to work with JsonElement from Kotlinx Serialization Json,
 this allows you to easily work with JSON in Kotlin in a typed manner.
 
-```kotlin
-    val companyJson = Json.decodeFromString<JsonElement>(companyJsonString)
-    JsonPath.select("name").string.modify(companyJson, String::uppercase).let(::println)
-    JsonPath.path("address.street.name").string.getOrNull(companyJson)?.let(::println)
-    val employeeLastNames = JsonPath.select("employees").every.select("lastName").string
-    employeeLastNames.modify(companyJson, String::capitalize).let(employeeLastNames::getAll).let(::println)
-    JsonPath.select("employees")[0].select("name").string.getAll(companyJson).let(::println)
-    JsonPath.select("employees").every.filterKeys { it == "name" }.string.getAll(companyJson).let(::println)
-```
+<!--- TEST_NAME ReadMeTest --> 
+
 ```json
 {
   "name": "Arrow",
@@ -34,10 +27,51 @@ this allows you to easily work with JSON in Kotlin in a typed manner.
   ]
 }
 ```
+
+<!--- INCLUDE
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import arrow.optics.Optional
+import io.github.nomisrev.JsonPath
+import io.github.nomisrev.select
+import io.github.nomisrev.string
+
+private const val jsonString = """
+    {
+      "name": "Arrow",
+      "address": {
+        "city": "Functional Town",
+        "street": {
+          "number": 1337,
+          "name": "Functional street"
+        }
+      },
+      "employees": [
+        {
+          "name": "John",
+          "lastName": "doe"
+        },
+        {
+          "name": "Jane",
+          "lastName": "doe"
+        }
+      ]
+    }"""
+fun main() {
+----- SUFFIX
+    .let { println(it) }
+}
+-->
+```kotlin
+  val jsonElement = Json.decodeFromString<JsonElement>(jsonString)
+  val name: Optional<JsonElement, String> = JsonPath.select("name").string
+  name.modify(jsonElement, String::uppercase)
+```
+> You can get the full code [here](guide/example/example-readme-01.kt).
+
 ```text
 {"name":"ARROW","address":{"city":"Functional Town","street":{"number":1337,"name":"Functional street"}},"employees":[{"name":"John","lastName":"doe"},{"name":"Jane","lastName":"doe"}]}
-Functional street
-[Doe, Doe]
-[John]
-[John, Jane]
 ```
+
+<!--- TEST -->
