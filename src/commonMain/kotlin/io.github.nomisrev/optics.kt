@@ -29,24 +29,6 @@ import kotlinx.serialization.json.floatOrNull
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.longOrNull
 
-public fun Index.Companion.jsonObject(): Index<JsonObject, String, JsonElement> =
-  JsonObjectIndex
-
-public fun At.Companion.jsonObject(): At<JsonObject, String, Option<JsonElement>> =
-  JsonObjectAt
-
-public fun PEvery.Companion.jsonObject(): Every<JsonObject, JsonElement> =
-  JsonObjectEvery
-
-public fun PEvery.Companion.jsonArray(): Every<JsonArray, JsonElement> =
-  JsArrayEvery
-
-public fun PEvery.Companion.jsonElement(): Every<JsonElement, JsonElement> =
-  JsonElementEvery
-
-public fun Index.Companion.jsonArray(): Index<JsonArray, Int, JsonElement> =
-  JsArrayIndex
-
 public fun POptional.Companion.jsonBoolean(): Optional<JsonElement, Boolean> =
   JsonElementToBoolean
 
@@ -71,8 +53,26 @@ public fun POptional.Companion.jsonNull(): Optional<JsonElement, JsonNull> =
 public fun POptional.Companion.jsonArray(): Optional<JsonElement, List<JsonElement>> =
   JsonElementToJsonArray
 
+public fun PEvery.Companion.jsonArray(): Every<JsonArray, JsonElement> =
+  JsArrayEvery
+
+public fun Index.Companion.jsonArray(): Index<JsonArray, Int, JsonElement> =
+  JsArrayIndex
+
 public fun POptional.Companion.jsonObject(): Optional<JsonElement, Map<String, JsonElement>> =
   JsonElementToJsonObject
+
+public fun PEvery.Companion.jsonObject(): Every<JsonObject, JsonElement> =
+  JsonObjectEvery
+
+public fun Index.Companion.jsonObject(): Index<JsonObject, String, JsonElement> =
+  JsonObjectIndex
+
+public fun At.Companion.jsonObject(): At<JsonObject, String, Option<JsonElement>> =
+  JsonObjectAt
+
+public fun PEvery.Companion.jsonElement(): Every<JsonElement, JsonElement> =
+  JsonElementEvery
 
 private object JsonObjectIndex : Index<JsonObject, String, JsonElement> {
   override fun index(i: String): Optional<JsonObject, JsonElement> = Optional(
@@ -126,13 +126,6 @@ private object JsArrayIndex : Index<JsonArray, Int, JsonElement> {
     }
   )
 }
-
-@PublishedApi
-internal fun <A> Optional<JsonElement, JsonElement>.extract(
-  serializer: KSerializer<A>,
-  parser: Json = Json.Default
-): Optional<JsonElement, A> =
-  this composePrism parse(serializer, parser)
 
 /**
  * Unsafe optic: needs some investigation because it is required to extract reasonable typed values from Json.

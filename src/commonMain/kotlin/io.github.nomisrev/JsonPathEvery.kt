@@ -9,6 +9,7 @@ import arrow.optics.typeclasses.At
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.FilterIndex.Companion
 import arrow.optics.typeclasses.Index
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -65,4 +66,7 @@ public fun Every<JsonElement, JsonElement>.filterKeys(p: (String) -> Boolean): E
   `object` compose FilterIndex.map<String, JsonElement>().filter(p)
 
 public inline fun <reified A> Every<JsonElement, JsonElement>.extract(parser: Json = Json): Every<JsonElement, A> =
-  this compose parse(serializer(), parser)
+  extract(serializer(), parser)
+
+public inline fun <A> Every<JsonElement, JsonElement>.extract(serializer: KSerializer<A>,parser: Json = Json): Every<JsonElement, A> =
+  this compose parse(serializer, parser)

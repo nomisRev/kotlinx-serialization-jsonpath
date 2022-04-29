@@ -1,11 +1,10 @@
-repositories {
-  google()
-  gradlePluginPortal()
-  mavenCentral()
+plugins {
+  `kotlin-dsl`
 }
 
-plugins {
-  id("org.gradle.kotlin.kotlin-dsl") version "2.3.3"
+repositories {
+  google()
+  mavenCentral()
 }
 
 @Suppress("GradlePluginVersion")

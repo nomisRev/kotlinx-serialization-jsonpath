@@ -3,6 +3,7 @@ package io.github.nomisrev
 import arrow.core.Option
 import arrow.optics.Every
 import arrow.optics.Optional
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -46,7 +47,10 @@ public inline val Optional<JsonElement, JsonElement>.every: Every<JsonElement, J
 public fun Optional<JsonElement, JsonElement>.select(name: String): Optional<JsonElement, JsonElement> =
   `object` compose arrow.optics.typeclasses.Index.map<String, JsonElement>().index(name)
 
-public fun Optional<JsonElement, JsonElement>.path(path: String, delimiter: String = "."): Optional<JsonElement, JsonElement> =
+public fun Optional<JsonElement, JsonElement>.path(
+  path: String,
+  delimiter: String = "."
+): Optional<JsonElement, JsonElement> =
   path.split(delimiter).fold(this) { acc, pathSelector ->
     acc.select(pathSelector)
   }
@@ -67,4 +71,10 @@ public fun Optional<JsonElement, JsonElement>.filterKeys(p: (String) -> Boolean)
   `object` compose arrow.optics.typeclasses.FilterIndex.map<String, JsonElement>().filter(p)
 
 public inline fun <reified A> Optional<JsonElement, JsonElement>.extract(parser: Json = Json): Optional<JsonElement, A> =
-  this composePrism parse(serializer(), parser)
+  extract(serializer(), parser)
+
+public inline fun <A> Optional<JsonElement, JsonElement>.extract(
+  serializer: KSerializer<A>,
+  parser: Json = Json.Default
+): Optional<JsonElement, A> =
+  this composePrism parse(serializer, parser)
