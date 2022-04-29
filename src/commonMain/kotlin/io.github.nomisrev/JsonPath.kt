@@ -5,10 +5,8 @@ import arrow.optics.Every
 import arrow.optics.Optional
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.serializer
 
 @Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
@@ -35,46 +33,58 @@ public inline val Optional<JsonElement, JsonElement>.int: Optional<JsonElement, 
 public inline val Optional<JsonElement, JsonElement>.array: Optional<JsonElement, List<JsonElement>>
   inline get() = this composeOptional Optional.jsonArray()
 
-public inline val Optional<JsonElement, JsonElement>.`object`: Optional<JsonElement, Map<String, JsonElement>>
+@Suppress("TopLevelPropertyNaming")
+public inline val Optional<JsonElement, JsonElement>.`object`:
+  Optional<JsonElement, Map<String, JsonElement>>
   inline get() = this composeOptional Optional.jsonObject()
 
+@Suppress("TopLevelPropertyNaming")
 public inline val Optional<JsonElement, JsonElement>.`null`: Optional<JsonElement, JsonNull>
   inline get() = this composeOptional Optional.jsonNull()
 
 public inline val Optional<JsonElement, JsonElement>.every: Every<JsonElement, JsonElement>
   inline get() = this compose Every.jsonElement()
 
-public fun Optional<JsonElement, JsonElement>.select(name: String): Optional<JsonElement, JsonElement> =
+public fun Optional<JsonElement, JsonElement>.select(
+  name: String
+): Optional<JsonElement, JsonElement> =
   `object` compose arrow.optics.typeclasses.Index.map<String, JsonElement>().index(name)
 
 public fun Optional<JsonElement, JsonElement>.path(
   path: String,
   delimiter: String = "."
 ): Optional<JsonElement, JsonElement> =
-  path.split(delimiter).fold(this) { acc, pathSelector ->
-    acc.select(pathSelector)
-  }
+  path.split(delimiter).fold(this) { acc, pathSelector -> acc.select(pathSelector) }
 
-public operator fun Optional<JsonElement, JsonElement>.get(name: String): Optional<JsonElement, JsonElement> =
-  select(name)
+public operator fun Optional<JsonElement, JsonElement>.get(
+  name: String
+): Optional<JsonElement, JsonElement> = select(name)
 
-public fun Optional<JsonElement, JsonElement>.at(field: String): Optional<JsonElement, Option<JsonElement>> =
+public fun Optional<JsonElement, JsonElement>.at(
+  field: String
+): Optional<JsonElement, Option<JsonElement>> =
   `object` compose arrow.optics.typeclasses.At.map<String, JsonElement>().at(field)
 
-public operator fun Optional<JsonElement, JsonElement>.get(i: Int): Optional<JsonElement, JsonElement> =
+public operator fun Optional<JsonElement, JsonElement>.get(
+  i: Int
+): Optional<JsonElement, JsonElement> =
   array compose arrow.optics.typeclasses.Index.list<JsonElement>().index(i)
 
-public fun Optional<JsonElement, JsonElement>.filterIndex(p: (Int) -> Boolean): Every<JsonElement, JsonElement> =
+public fun Optional<JsonElement, JsonElement>.filterIndex(
+  p: (Int) -> Boolean
+): Every<JsonElement, JsonElement> =
   array compose arrow.optics.typeclasses.FilterIndex.list<JsonElement>().filter(p)
 
-public fun Optional<JsonElement, JsonElement>.filterKeys(p: (String) -> Boolean): Every<JsonElement, JsonElement> =
+public fun Optional<JsonElement, JsonElement>.filterKeys(
+  p: (String) -> Boolean
+): Every<JsonElement, JsonElement> =
   `object` compose arrow.optics.typeclasses.FilterIndex.map<String, JsonElement>().filter(p)
 
-public inline fun <reified A> Optional<JsonElement, JsonElement>.extract(parser: Json = Json): Optional<JsonElement, A> =
-  extract(serializer(), parser)
+public inline fun <reified A> Optional<JsonElement, JsonElement>.extract(
+  parser: Json = Json
+): Optional<JsonElement, A> = extract(serializer(), parser)
 
-public inline fun <A> Optional<JsonElement, JsonElement>.extract(
+public fun <A> Optional<JsonElement, JsonElement>.extract(
   serializer: KSerializer<A>,
   parser: Json = Json.Default
-): Optional<JsonElement, A> =
-  this composePrism parse(serializer, parser)
+): Optional<JsonElement, A> = this composePrism parse(serializer, parser)

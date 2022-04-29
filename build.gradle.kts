@@ -2,12 +2,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 @Suppress("DSL_SCOPE_VIOLATION") plugins {
   application
-  alias(libs.plugins.kotest.multiplatform)
   id(libs.plugins.kotlin.multiplatform.pluginId)
-  alias(libs.plugins.arrow.kotlin)
-  alias(libs.plugins.arrow.formatter)
-  alias(libs.plugins.dokka)
   id(libs.plugins.detekt.pluginId)
+  alias(libs.plugins.kotest.multiplatform)
+  alias(libs.plugins.dokka)
   alias(libs.plugins.kover)
   alias(libs.plugins.kotlinx.serialization)
 }
@@ -44,8 +42,41 @@ tasks {
   }
 }
 
+tasks.withType<Test>().configureEach {
+  maxParallelForks = Runtime.getRuntime().availableProcessors()
+  useJUnitPlatform()
+  testLogging {
+    setExceptionFormat("full")
+    setEvents(listOf("passed", "skipped", "failed", "standardOut", "standardError"))
+  }
+}
 
 kotlin {
+  jvm()
+  js(IR) {
+    browser()
+    nodejs()
+  }
+
+  linuxX64()
+
+  mingwX64()
+
+  iosArm32()
+  iosArm64()
+  iosSimulatorArm64()
+  iosX64()
+  macosArm64()
+  macosX64()
+  tvosArm64()
+  tvosSimulatorArm64()
+  tvosX64()
+  watchosArm32()
+  watchosArm64()
+  watchosSimulatorArm64()
+  watchosX64()
+  watchosX86()
+
   sourceSets {
     commonMain {
       dependencies {
