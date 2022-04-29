@@ -1,7 +1,14 @@
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 enableFeaturePreview("VERSION_CATALOGS")
 
-rootProject.name = "ArrowMPPTemplate"
+rootProject.name = "kotlinx-serialization-jsonpath"
+
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    mavenCentral()
+  }
+}
 
 plugins {
   id("com.gradle.enterprise") version "3.10"
@@ -16,6 +23,7 @@ dependencyResolutionManagement {
 
   repositories {
     mavenCentral()
+    gradlePluginPortal()
   }
 }
 
