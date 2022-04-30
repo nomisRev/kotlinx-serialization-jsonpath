@@ -102,17 +102,18 @@ class JsonDSLSpec : StringSpec({
     }
   }
 
-//  "extract from object" {
-//    checkAll(Arb.json(Arb.city())) { cityJson ->
-//      JsonPath.extract<City>().getOrNull(cityJson) shouldBe Json.decodeFromJsonElement<City>(cityJson)
-//    }
-//  }
+  "extract from object" {
+    checkAll(Arb.json(Arb.city())) { cityJson ->
+      JsonPath.extract(City.serializer())
+        .getOrNull(cityJson) shouldBe Json.decodeFromJsonElement<City>(cityJson)
+    }
+  }
 
-//  "get from array" {
-//    checkAll(Arb.json(Arb.city())) { cityJson ->
-//      JsonPath.select("streets")[0]
-//        .extract<Street>()
-//        .getOrNull(cityJson) shouldBe Json.decodeFromJsonElement<City>(cityJson).streets.getOrNull(0)
-//    }
-//  }
+  "get from array" {
+    checkAll(Arb.json(Arb.city())) { cityJson ->
+      JsonPath.select("streets")[0]
+        .extract(Street.serializer())
+        .getOrNull(cityJson) shouldBe Json.decodeFromJsonElement<City>(cityJson).streets.getOrNull(0)
+    }
+  }
 })
