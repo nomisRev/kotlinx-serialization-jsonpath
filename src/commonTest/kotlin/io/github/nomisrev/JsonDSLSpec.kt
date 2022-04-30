@@ -24,8 +24,6 @@ data class Street(val name: String)
 
 class JsonDSLSpec : StringSpec({
 
-  PropertyTesting.defaultIterationCount = 50
-
   "bool prism" {
     checkAll(Arb.jsBoolean()) { jsBool ->
       JsonPath.boolean.getOrNull(jsBool) shouldBe jsBool.boolean
