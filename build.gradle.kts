@@ -19,9 +19,6 @@ version "1.0"
 
 repositories {
   mavenCentral()
-  maven {
-    url = uri("https://oss.sonatype.org/content/repositories/snapshots")
-  }
 }
 
 allprojects {
@@ -64,9 +61,7 @@ kotlin {
   }
 
   linuxX64()
-
   mingwX64()
-
   iosArm32()
   iosArm64()
   iosSimulatorArm64()

@@ -1,5 +1,7 @@
 package io.github.nomisrev
 
+import io.kotest.common.Platform
+import io.kotest.common.platform
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
@@ -11,7 +13,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.boolean
-import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.float
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.long
@@ -102,18 +103,19 @@ class JsonDSLSpec : StringSpec({
     }
   }
 
-  "extract from object" {
+  // See https://github.com/Kotlin/kotlinx.serialization/issues/1914
+  "extract from object".config(enabled = platform != Platform.Native) {
     checkAll(Arb.json(Arb.city())) { cityJson ->
       JsonPath.extract(City.serializer())
-        .getOrNull(cityJson) shouldBe Json.decodeFromJsonElement<City>(cityJson)
+        .getOrNull(cityJson) shouldBe Json.decodeFromJsonElement(City.serializer(), cityJson)
     }
   }
 
-  "get from array" {
+  "get from array".config(enabled = platform != Platform.Native) {
     checkAll(Arb.json(Arb.city())) { cityJson ->
       JsonPath.select("streets")[0]
         .extract(Street.serializer())
-        .getOrNull(cityJson) shouldBe Json.decodeFromJsonElement<City>(cityJson).streets.getOrNull(0)
+        .getOrNull(cityJson) shouldBe Json.decodeFromJsonElement(City.serializer(), cityJson).streets.getOrNull(0)
     }
   }
 })
