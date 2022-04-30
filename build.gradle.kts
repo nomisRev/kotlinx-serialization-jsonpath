@@ -169,31 +169,3 @@ fun Project.setupDetekt() {
 infix fun <T> Property<T>.by(value: T) {
   set(value)
 }
-
-fun Project.setupDetekt() {
-  plugins.apply("io.gitlab.arturbosch.detekt")
-
-  configure<DetektExtension> {
-    parallel = true
-    buildUponDefaultConfig = true
-    allRules = true
-  }
-
-  tasks.withType<Detekt>().configureEach {
-    exclude { "generated/sqldelight" in it.file.absolutePath }
-    reports {
-      html.required by true
-      sarif.required by true
-      txt.required by false
-      xml.required by false
-    }
-  }
-
-  tasks.configureEach {
-    if (name == "build") dependsOn(tasks.withType<Detekt>())
-  }
-}
-
-infix fun <T> Property<T>.by(value: T) {
-  set(value)
-}
