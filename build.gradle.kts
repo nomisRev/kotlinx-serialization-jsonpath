@@ -71,9 +71,7 @@ kotlin {
   }
 
   linuxX64()
-
   mingwX64()
-
   iosArm32()
   iosArm64()
   iosSimulatorArm64()
