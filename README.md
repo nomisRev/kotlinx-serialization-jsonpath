@@ -68,7 +68,7 @@ fun main() {
   val name: Optional<JsonElement, String> = JsonPath.select("name").string
   name.modify(jsonElement, String::uppercase)
 ```
-> You can get the full code [here](guide/example/example-readme-01.kt).
+> You can get the full code [here](src/jvmTest/example/example-readme-01.kt).
 
 ```text
 {"name":"ARROW","address":{"city":"Functional Town","street":{"number":1337,"name":"Functional street"}},"employees":[{"name":"John","lastName":"doe"},{"name":"Jane","lastName":"doe"}]}

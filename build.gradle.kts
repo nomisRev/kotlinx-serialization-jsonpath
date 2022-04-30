@@ -2,6 +2,7 @@ import kotlinx.knit.KnitPluginExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
+import kotlinx.kover.api.KoverTaskExtension
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
@@ -34,31 +35,31 @@ repositories {
 allprojects {
   extra.set("dokka.outputDirectory", rootDir.resolve("docs"))
   setupDetekt()
+
+  tasks {
+    withType<KotlinCompile>().configureEach {
+      kotlinOptions {
+        jvmTarget = "1.8"
+      }
+      sourceCompatibility = "1.8"
+      targetCompatibility = "1.8"
+    }
+
+    withType<Test>().configureEach {
+      maxParallelForks = Runtime.getRuntime().availableProcessors()
+      useJUnitPlatform()
+      testLogging {
+        setExceptionFormat("full")
+        setEvents(listOf("passed", "skipped", "failed", "standardOut", "standardError"))
+      }
+    }
+  }
 }
 
-tasks {
-  withType<KotlinCompile>().configureEach {
-    kotlinOptions {
-      jvmTarget = "1.8"
-    }
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
-  }
-
-  test {
-    useJUnitPlatform()
-    extensions.configure(kotlinx.kover.api.KoverTaskExtension::class) {
-      includes = listOf("io.github.nomisrev.*")
-    }
-  }
-}
-
-tasks.withType<Test>().configureEach {
-  maxParallelForks = Runtime.getRuntime().availableProcessors()
+tasks.test {
   useJUnitPlatform()
-  testLogging {
-    setExceptionFormat("full")
-    setEvents(listOf("passed", "skipped", "failed", "standardOut", "standardError"))
+  extensions.configure(KoverTaskExtension::class) {
+    includes = listOf("io.github.nomisrev.*")
   }
 }
 
@@ -141,7 +142,6 @@ tasks {
   getByName("knitPrepare").dependsOn(getTasksByName("dokka", true))
 }
 
-
 fun Project.setupDetekt() {
   plugins.apply("io.gitlab.arturbosch.detekt")
 
@@ -151,18 +151,19 @@ fun Project.setupDetekt() {
     allRules = true
   }
 
-  tasks.withType<Detekt>().configureEach {
-    exclude { "generated/sqldelight" in it.file.absolutePath }
-    reports {
-      html.required by true
-      sarif.required by true
-      txt.required by false
-      xml.required by false
+  tasks {
+    withType<Detekt>().configureEach {
+      reports {
+        html.required by true
+        sarif.required by true
+        txt.required by false
+        xml.required by false
+      }
     }
-  }
 
-  tasks.configureEach {
-    if (name == "build") dependsOn(tasks.withType<Detekt>())
+    configureEach {
+      if (name == "build") dependsOn(withType<Detekt>())
+    }
   }
 }
 
