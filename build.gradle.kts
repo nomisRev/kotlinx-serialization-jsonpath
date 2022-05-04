@@ -4,6 +4,13 @@ import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import kotlinx.kover.api.KoverTaskExtension
 import org.gradle.api.Project
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
+import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
+import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
+import org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR
+import org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.dokka.gradle.DokkaTask
@@ -49,8 +56,8 @@ allprojects {
       maxParallelForks = Runtime.getRuntime().availableProcessors()
       useJUnitPlatform()
       testLogging {
-        setExceptionFormat("full")
-        setEvents(listOf("passed", "skipped", "failed", "standardOut", "standardError"))
+        exceptionFormat = TestExceptionFormat.FULL
+        events = setOf(PASSED, SKIPPED, FAILED, STANDARD_OUT, STANDARD_ERROR)
       }
     }
   }
@@ -107,7 +114,8 @@ kotlin {
 
     named("jvmTest") {
       dependencies {
-        implementation("io.kotest:kotest-runner-junit5-jvm:5.2.3")
+        implementation(libs.kotest.runnerJUnit5)
+        implementation(libs.kotlinx.knit.test)
       }
     }
   }

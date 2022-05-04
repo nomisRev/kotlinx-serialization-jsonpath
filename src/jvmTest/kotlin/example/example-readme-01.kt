@@ -1,15 +1,13 @@
 // This file was automatically generated from README.md by Knit tool. Do not edit.
 package com.example.exampleReadme01
 
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
-import arrow.optics.Optional
-import io.github.nomisrev.JsonPath
-import io.github.nomisrev.select
-import io.github.nomisrev.string
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
+import arrow.optics.*
+import io.github.nomisrev.*
+import arrow.optics.typeclasses.*
 
-private const val jsonString = """
+private const val JSON_STRING = """
     {
       "name": "Arrow",
       "address": {
@@ -30,10 +28,10 @@ private const val jsonString = """
         }
       ]
     }"""
-fun main() {
 
-  val jsonElement = Json.decodeFromString<JsonElement>(jsonString)
+fun main(): Unit {
+
+  val json: JsonElement = Json.decodeFromString(JSON_STRING)
   val name: Optional<JsonElement, String> = JsonPath.select("name").string
-  name.modify(jsonElement, String::uppercase)
-    .let { println(it) }
+  println(name.modify(json, String::uppercase))
 }
