@@ -7,7 +7,7 @@ import arrow.optics.*
 import io.github.nomisrev.*
 import arrow.optics.typeclasses.*
 
-private const val jsonString = """
+private const val JSON_STRING = """
     {
       "name": "Arrow",
       "address": {
@@ -31,7 +31,7 @@ private const val jsonString = """
 
 fun main(): Unit {
 
-  val json: JsonElement = Json.decodeFromString(jsonString)
+  val json: JsonElement = Json.decodeFromString(JSON_STRING)
   val employeesName: Every<JsonElement, String> = JsonPath.select("employees").every.select("name").string
   val res: JsonElement = employeesName.modify(json, String::uppercase).also(::println)
   employeesName.getAll(res).also(::println)

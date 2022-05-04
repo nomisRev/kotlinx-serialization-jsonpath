@@ -34,9 +34,9 @@ fun main(): Unit {
 }
 -->
 ```kotlin
-  val json: JsonElement = Json.decodeFromString(jsonString)
+  val json: JsonElement = Json.decodeFromString(JSON_STRING)
   val name: Optional<JsonElement, String> = JsonPath.select("name").string
-  val res: JsonElement = name.modify(json, String::uppercase).also(::println)
+  println(name.modify(json, String::uppercase))
 ```
 > You can get the full code [here](src/jvmTest/kotlin/example/example-readme-01.kt).
 
@@ -52,7 +52,7 @@ fun main(): Unit {
 }
 -->
 ```kotlin
-  val json: JsonElement = Json.decodeFromString(jsonString)
+  val json: JsonElement = Json.decodeFromString(JSON_STRING)
   val name: Optional<JsonElement, String> = JsonPath.path("address.street.name").string
   val res: JsonElement = name.modify(json, String::uppercase).also(::println)
   name.getOrNull(res)?.also(::println)
@@ -72,7 +72,7 @@ fun main(): Unit {
 }
 -->
 ```kotlin
-  val json: JsonElement = Json.decodeFromString(jsonString)
+  val json: JsonElement = Json.decodeFromString(JSON_STRING)
   val employeesName: Every<JsonElement, String> = JsonPath.select("employees").every.select("name").string
   val res: JsonElement = employeesName.modify(json, String::uppercase).also(::println)
   employeesName.getAll(res).also(::println)

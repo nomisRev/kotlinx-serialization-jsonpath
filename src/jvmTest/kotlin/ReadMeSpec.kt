@@ -1,4 +1,6 @@
 // This file was automatically generated from README.md by Knit tool. Do not edit.
+@file:Suppress("MaxLineLength")
+
 package com.example.test
 
 import io.kotest.core.spec.style.StringSpec
