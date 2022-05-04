@@ -1,0 +1,30 @@
+// This file was automatically generated from ${file.name} by Knit tool. Do not edit.
+package ${knit.package}.${knit.name}
+
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
+import arrow.optics.*
+import io.github.nomisrev.*
+import arrow.optics.typeclasses.*
+
+private const val jsonString = """
+    {
+      "name": "Arrow",
+      "address": {
+        "city": "Functional Town",
+        "street": {
+          "number": 1337,
+          "name": "Functional street"
+        }
+      },
+      "employees": [
+        {
+          "name": "John",
+          "lastName": "doe"
+        },
+        {
+          "name": "Jane",
+          "lastName": "doe"
+        }
+      ]
+    }"""
