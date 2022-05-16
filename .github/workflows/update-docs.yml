@@ -33,3 +33,4 @@ jobs:
           git config --global user.name "Simon Vergauwen"
           git add docs/.
           git commit -m "Automaticaly update docs"
+          git push
