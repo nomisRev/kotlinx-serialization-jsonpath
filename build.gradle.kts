@@ -128,7 +128,7 @@ configure<KnitPluginExtension> {
 tasks {
   withType<DokkaTask>().configureEach {
     outputDirectory.set(rootDir.resolve("docs"))
-    moduleName.set("kotlin-kafka")
+    moduleName.set("KotlinX Serialization JsonPath")
     dokkaSourceSets {
       named("commonMain") {
         includes.from("README.md")

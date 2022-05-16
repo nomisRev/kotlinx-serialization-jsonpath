@@ -1,4 +1,4 @@
-# KotlinX Serialization JsonPath
+# Module KotlinX Serialization JsonPath
 
 JsonPath offers a simple DSL to work with JsonElement from Kotlinx Serialization Json,
 this allows you to easily work with JSON in Kotlin in a typed manner.
