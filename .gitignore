@@ -169,3 +169,5 @@ gradle-app.setting
 kotlin-js-store
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij+all,kotlin,gradle,macos
+
+gradle-build-scan.txt
