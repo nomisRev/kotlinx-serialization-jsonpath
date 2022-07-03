@@ -1,7 +1,17 @@
 # Module KotlinX Serialization JsonPath
 
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.nomisrev/kotlinx-serialization-jsonpath?color=4caf50&label=latest%20release)](https://maven-badges.herokuapp.com/maven-central/io.github.nomisrev/kotlinx-serialization-jsonpath)
+[![Latest snapshot](https://img.shields.io/badge/dynamic/xml?color=orange&label=latest%20snapshot&prefix=v&query=%2F%2Fmetadata%2Fversioning%2Flatest&url=https%3A%2F%2Fs01.oss.sonatype.org%2Fservice%2Flocal%2Frepositories%2Fsnapshots%2Fcontent%2Fio%2Fgithub%2Fnomisrev%2Fkotlinx-serialization-jsonpath%2Fmaven-metadata.xml)](https://s01.oss.sonatype.org/service/local/repositories/snapshots/content/io/github/nomisrev)
+
 JsonPath offers a simple DSL to work with JsonElement from Kotlinx Serialization Json,
 this allows you to easily work with JSON in Kotlin in a typed manner.
+Simply add the following dependency as `implementation` in the `build.gradle` dependencies` block.
+
+```groovy
+dependencies {
+  implementation("io.github.nomisrev:kotlinx-serialization-jsonpath:0.1.0")
+}
+```
 
 Let's dive right in with following `JSON_STRING` as input `JsonElement` that models a simple company.
 
@@ -118,45 +128,3 @@ fun main(): Unit {
 {"name":"Arrow","address":{"city":"Functional Town","street":{"number":1337,"name":"Functional street"}},"employees":[{"name":"JOHN","lastName":"doe"},{"name":"JANE","lastName":"doe"}]}
 [JOHN, JANE]
 ```
-
-<!--- TEST -->
-
-<!--- INCLUDE
-fun main(): Unit {
------ SUFFIX
-}
--->
-```kotlin
-  val json: JsonElement = Json.decodeFromString(JSON_STRING)
-  val name: Optional<JsonElement, String> = JsonPath.path("address.street.name").string
-  val res: JsonElement = name.modify(json, String::uppercase).also(::println)
-  name.getOrNull(res)?.also(::println)
-```
-> You can get the full code [here](src/jvmTest/kotlin/example/example-readme-04.kt).
-
-```text
-{"name":"Arrow","address":{"city":"Functional Town","street":{"number":1337,"name":"FUNCTIONAL STREET"}},"employees":[{"name":"John","lastName":"doe"},{"name":"Jane","lastName":"doe"}]}
-FUNCTIONAL STREET
-```
-
-<!--- TEST -->
-
-<!--- INCLUDE
-fun main(): Unit {
------ SUFFIX
-}
--->
-```kotlin
-  val json: JsonElement = Json.decodeFromString(JSON_STRING)
-  val employeesName: Every<JsonElement, String> = JsonPath.select("employees").every.select("name").string
-  val res: JsonElement = employeesName.modify(json, String::uppercase).also(::println)
-  employeesName.getAll(res).also(::println)
-```
-> You can get the full code [here](src/jvmTest/kotlin/example/example-readme-05.kt).
-
-```text
-{"name":"Arrow","address":{"city":"Functional Town","street":{"number":1337,"name":"Functional street"}},"employees":[{"name":"JOHN","lastName":"doe"},{"name":"JANE","lastName":"doe"}]}
-[JOHN, JANE]
-```
-
-<!--- TEST -->
