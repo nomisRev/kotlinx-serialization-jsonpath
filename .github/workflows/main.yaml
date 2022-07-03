@@ -73,7 +73,7 @@ jobs:
       SIGNING_KEY_ID: '${{ secrets.SIGNING_KEY_ID }}'
       SIGNING_KEY_PASSPHRASE: '${{ secrets.SIGNING_KEY_PASSPHRASE }}'
       SIGNING_KEY: '${{ secrets.SIGNING_KEY }}'
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       - name: Checkout
