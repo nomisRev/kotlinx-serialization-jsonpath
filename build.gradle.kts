@@ -163,3 +163,12 @@ fun Project.setupDetekt() {
 infix fun <T> Property<T>.by(value: T) {
   set(value)
 }
+
+nexusPublishing {
+  repositories {
+    named("sonatype") {
+      nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+      snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+    }
+  }
+}
