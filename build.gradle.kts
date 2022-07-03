@@ -5,7 +5,6 @@ import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import kotlinx.kover.api.KoverTaskExtension
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
@@ -24,8 +23,11 @@ buildscript {
 @Suppress("DSL_SCOPE_VIOLATION") plugins {
   application
   alias(libs.plugins.kotlin.multiplatform)
-  alias(libs.plugins.detekt)
+  alias(libs.plugins.arrow.publish)
+  alias(libs.plugins.arrow.nexus)
+  alias(libs.plugins.arrow.kotlin)
   alias(libs.plugins.kotest.multiplatform)
+  alias(libs.plugins.detekt)
   alias(libs.plugins.dokka)
   alias(libs.plugins.kover)
   alias(libs.plugins.kotlinx.serialization)
@@ -41,6 +43,8 @@ repositories {
 
 allprojects {
   extra.set("dokka.outputDirectory", rootDir.resolve("docs"))
+  group = property("projects.group").toString()
+  version = property("projects.version").toString()
   setupDetekt()
 
   tasks {
@@ -71,29 +75,6 @@ tasks.test {
 }
 
 kotlin {
-  jvm()
-  js(IR) {
-    browser()
-    nodejs()
-  }
-
-  linuxX64()
-  mingwX64()
-  iosArm32()
-  iosArm64()
-  iosSimulatorArm64()
-  iosX64()
-  macosArm64()
-  macosX64()
-  tvosArm64()
-  tvosSimulatorArm64()
-  tvosX64()
-  watchosArm32()
-  watchosArm64()
-  watchosSimulatorArm64()
-  watchosX64()
-  watchosX86()
-
   sourceSets {
     commonMain {
       dependencies {
@@ -146,6 +127,12 @@ tasks {
   }
 
   getByName("knitPrepare").dependsOn(getTasksByName("dokka", true))
+  
+  register<Delete>("cleanDocs") {
+    val folder = file("docs").also { it.mkdir() }
+    val docsContent = folder.listFiles().filter { it != folder }
+    delete(docsContent)
+  }
 }
 
 fun Project.setupDetekt() {
