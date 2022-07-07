@@ -117,6 +117,7 @@ tasks {
           matchingRegex.set(".*\\.internal.*")
           suppress.set(true)
         }
+        externalDocumentationLink("https://kotlinlang.org/api/kotlinx.serialization/")
         sourceLink {
           localDirectory.set(file("src/commonMain/kotlin"))
           remoteUrl.set(uri("https://github.com/nomisRev/kotlinx-serialization-jsonpath/tree/main/src/commonMain/kotlin").toURL())
