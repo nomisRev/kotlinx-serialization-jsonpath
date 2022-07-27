@@ -58,22 +58,76 @@ public inline val Every<JsonElement, JsonElement>.`null`: Every<JsonElement, Jso
 public inline val Every<JsonElement, JsonElement>.every: Every<JsonElement, JsonElement>
   inline get() = this compose Every.jsonElement()
 
-/** Select property with [name] */
-public fun Every<JsonElement, JsonElement>.select(name: String): Every<JsonElement, JsonElement> =
-  `object` compose Index.map<String, JsonElement>().index(name)
+/**
+ * Select value at [selector]. The following syntax is supported for [selector]:
+ * - without square brackets: select the property with that name,
+ * - `['field']`: select the property with that name,
+ * - `[i]`, where `i` is a number: select the index in an array.
+ */
+public fun Every<JsonElement, JsonElement>.select(selector: String): Every<JsonElement, JsonElement> {
+  val inBrackets = matchNameInBrackets(selector)
+  val ix = matchIndexInBrackets(selector)
+  return when {
+    inBrackets != null -> `object` compose Index.map<String, JsonElement>().index(inBrackets)
+    ix != null -> get(ix)
+    else -> `object` compose Index.map<String, JsonElement>().index(selector)
+  }
+}
 
 /**
- * Select _path_ with _dot (.) notation_
+ * Select values at [selector]. The following syntax is supported for [selector]:
+ * - without square brackets: select the property with that name,
+ * - `['field']`: select the property with that name,
+ * - `*`: select all the fields or indices,
+ * - `[i]`, where `i` is a number: select the index in an array,
+ * - `[i,j,...]` where `i,j,...` are numbers: select the indices in an array,
+ * - `[start:end]`: select the indices from `start` to (but not including) `end`,
+ * - `[start:]`: select the indices from `start` to the end of the array.
+ */
+public fun Every<JsonElement, JsonElement>.selectMultiple(
+  selector: String
+): Every<JsonElement, JsonElement> {
+  val inBrackets = matchNameInBrackets(selector)
+  val ixs = matchIndicesInBrackets(selector)
+  val startIx = matchStartIndex(selector)
+  val startEndIx = matchStartEndIndex(selector)
+  return when {
+    inBrackets != null -> `object` compose Index.map<String, JsonElement>().index(inBrackets)
+    selector == "*" -> this compose Every.jsonElement() // inline definition of [every]
+    ixs != null -> filterIndex { it in ixs }
+    startIx != null -> filterIndex { it >= startIx }
+    startEndIx != null -> filterIndex { it >= startEndIx.first && it < startEndIx.second }
+    else -> `object` compose Index.map<String, JsonElement>().index(selector)
+  }
+}
+
+/**
+ * Select _path_ with _dot (.) or bracket ([i]) notation_
  *
  * ```kotlin
- * JsonPath.every.path("address.street.name")
+ * JsonPath.path("addresses[0].street.name")
  * ```
  */
 public fun Every<JsonElement, JsonElement>.path(
   path: String,
-  delimiter: String = "."
+  fieldDelimiter: String = ".",
+  indexDelimiter: String = "["
 ): Every<JsonElement, JsonElement> =
-  path.split(delimiter).fold(this) { acc, pathSelector -> acc.select(pathSelector) }
+  path.splitTwice(fieldDelimiter, indexDelimiter).fold(this) { acc, pathSelector -> acc.select(pathSelector) }
+
+/**
+ * Select _path_ with multiple results, see [selectMultiple] for the allowed selectors
+ *
+ * ```kotlin
+ * JsonPath.path("addresses[0].*.street.name")
+ * ```
+ */
+public fun Every<JsonElement, JsonElement>.pathMultiple(
+  path: String,
+  fieldDelimiter: String = ".",
+  indexDelimiter: String = "["
+): Every<JsonElement, JsonElement> =
+  path.splitTwice(fieldDelimiter, indexDelimiter).fold(this) { acc, pathSelector -> acc.selectMultiple(pathSelector) }
 
 /**
  * Select a property with a [name] as an [Option].
