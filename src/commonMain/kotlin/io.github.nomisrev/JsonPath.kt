@@ -77,9 +77,9 @@ public fun Optional<JsonElement, JsonElement>.select(
   val inBrackets = matchNameInBrackets(selector)
   val ix = matchIndexInBrackets(selector)
   return when {
-    inBrackets != null -> `object` compose Index.map<String, JsonElement>().index(inBrackets)
+    inBrackets != null -> get(inBrackets)
     ix != null -> get(ix)
-    else -> `object` compose Index.map<String, JsonElement>().index(selector)
+    else -> get(selector)
   }
 }
 
@@ -93,7 +93,7 @@ public fun Optional<JsonElement, JsonElement>.select(
  * - `[start:end]`: select the indices from `start` to (but not including) `end`,
  * - `[start:]`: select the indices from `start` to the end of the array.
  */
-public fun Optional<JsonElement, JsonElement>.selectMultiple(
+public fun Optional<JsonElement, JsonElement>.selectEvery(
   selector: String
 ): Every<JsonElement, JsonElement> {
   val inBrackets = matchNameInBrackets(selector)
@@ -101,12 +101,12 @@ public fun Optional<JsonElement, JsonElement>.selectMultiple(
   val startIx = matchStartIndex(selector)
   val startEndIx = matchStartEndIndex(selector)
   return when {
-    inBrackets != null -> `object` compose Index.map<String, JsonElement>().index(inBrackets)
-    selector == "*" -> every
+    inBrackets != null -> get(inBrackets)
+    selector == "*" -> this compose Every.jsonElement() // inline definition of [every]
     ixs != null -> filterIndex { it in ixs }
     startIx != null -> filterIndex { it >= startIx }
     startEndIx != null -> filterIndex { it >= startEndIx.first && it < startEndIx.second }
-    else -> `object` compose Index.map<String, JsonElement>().index(selector)
+    else -> get(selector)
   }
 }
 
@@ -131,12 +131,14 @@ public fun Optional<JsonElement, JsonElement>.path(
  * JsonPath.path("addresses[0].*.street.name")
  * ```
  */
-public fun Optional<JsonElement, JsonElement>.pathMultiple(
+public fun Optional<JsonElement, JsonElement>.pathEvery(
   path: String,
   fieldDelimiter: String = ".",
   indexDelimiter: String = "["
 ): Every<JsonElement, JsonElement> =
-  path.splitTwice(fieldDelimiter, indexDelimiter).fold(this) { acc: Every<JsonElement, JsonElement>, pathSelector -> acc.selectMultiple(pathSelector) }
+  path.splitTwice(fieldDelimiter, indexDelimiter).fold(this) {
+      acc: Every<JsonElement, JsonElement>, pathSelector -> acc.selectEvery(pathSelector)
+  }
 
 /**
  * Select a property with a [name] as an [Option].
@@ -153,6 +155,12 @@ public fun Optional<JsonElement, JsonElement>.filterKeys(
   predicate: (keys: String) -> Boolean
 ): Every<JsonElement, JsonElement> =
   `object` compose FilterIndex.map<String, JsonElement>().filter(predicate)
+
+/** Select a [property] out of a [JsonObject] */
+public operator fun Optional<JsonElement, JsonElement>.get(
+  property: String
+): Optional<JsonElement, JsonElement> =
+  `object` compose Index.map<String, JsonElement>().index(property)
 
 /** Select an [index] out of a [JsonArray] */
 public operator fun Optional<JsonElement, JsonElement>.get(
