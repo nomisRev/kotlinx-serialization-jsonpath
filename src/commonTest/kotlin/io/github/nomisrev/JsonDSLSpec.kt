@@ -123,6 +123,14 @@ class JsonDSLSpec : StringSpec({
     }
   }
 
+  "get from array, using get".config(enabled = platform != Platform.Native) {
+    checkAll(Arb.json(Arb.city())) { cityJson ->
+      JsonPath["streets"][0..0]["name"].string
+        .getAll(cityJson)
+        .getOrNull(0) shouldBe Json.decodeFromJsonElement(City.serializer(), cityJson).streets.getOrNull(0)?.name
+    }
+  }
+
   "get from array, using select with special syntax".config(enabled = platform != Platform.Native) {
     checkAll(Arb.json(Arb.city())) { cityJson ->
       JsonPath.select("['streets']").select("[0]")

@@ -1,3 +1,4 @@
+@file:Suppress("TooManyFunctions", "InvalidPackageDeclaration")
 package io.github.nomisrev
 
 import arrow.core.Option
@@ -105,7 +106,7 @@ public fun Optional<JsonElement, JsonElement>.selectEvery(
     selector == "*" -> this compose Every.jsonElement() // inline definition of [every]
     ixs != null -> filterIndex { it in ixs }
     startIx != null -> filterIndex { it >= startIx }
-    startEndIx != null -> filterIndex { it >= startEndIx.first && it < startEndIx.second }
+    startEndIx != null -> get(startEndIx.first until startEndIx.second)
     else -> get(selector)
   }
 }
@@ -125,7 +126,7 @@ public fun Optional<JsonElement, JsonElement>.path(
   path.splitTwice(fieldDelimiter, indexDelimiter).fold(this) { acc, pathSelector -> acc.select(pathSelector) }
 
 /**
- * Select _path_ with multiple results, see [selectMultiple] for the allowed selectors
+ * Select _path_ with multiple results, see [selectEvery] for the allowed selectors
  *
  * ```kotlin
  * JsonPath.path("addresses[0].*.street.name")
@@ -167,6 +168,12 @@ public operator fun Optional<JsonElement, JsonElement>.get(
   index: Int
 ): Optional<JsonElement, JsonElement> =
   array compose Index.list<JsonElement>().index(index)
+
+/** Select all indices from the [range] out of a [JsonArray] */
+public operator fun Optional<JsonElement, JsonElement>.get(
+  range: ClosedRange<Int>
+): Every<JsonElement, JsonElement> =
+  filterIndex { it in range }
 
 /** Select an indices out of a [JsonArray] with the given [predicate] */
 public fun Optional<JsonElement, JsonElement>.filterIndex(
