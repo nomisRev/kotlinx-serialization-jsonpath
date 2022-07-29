@@ -108,11 +108,58 @@ class JsonDSLSpec : StringSpec({
     }
   }
 
-  "get from array".config(enabled = platform != Platform.Native) {
+  "get from array, using select and get".config(enabled = platform != Platform.Native) {
     checkAll(Arb.json(Arb.city())) { cityJson ->
       JsonPath.select("streets")[0]
         .extract(Street.serializer())
         .getOrNull(cityJson) shouldBe Json.decodeFromJsonElement(City.serializer(), cityJson).streets.getOrNull(0)
+    }
+  }
+
+  "get from array, using get".config(enabled = platform != Platform.Native) {
+    checkAll(Arb.json(Arb.city())) { cityJson ->
+      JsonPath["streets"][0]["name"].string
+        .getOrNull(cityJson) shouldBe Json.decodeFromJsonElement(City.serializer(), cityJson).streets.getOrNull(0)?.name
+    }
+  }
+
+  "get from array, using get".config(enabled = platform != Platform.Native) {
+    checkAll(Arb.json(Arb.city())) { cityJson ->
+      JsonPath["streets"][0..0]["name"].string
+        .getAll(cityJson)
+        .getOrNull(0) shouldBe Json.decodeFromJsonElement(City.serializer(), cityJson).streets.getOrNull(0)?.name
+    }
+  }
+
+  "get from array, using select with special syntax".config(enabled = platform != Platform.Native) {
+    checkAll(Arb.json(Arb.city())) { cityJson ->
+      JsonPath.select("['streets']").select("[0]")
+        .extract(Street.serializer())
+        .getOrNull(cityJson) shouldBe Json.decodeFromJsonElement(City.serializer(), cityJson).streets.getOrNull(0)
+    }
+  }
+
+  "get from array, using path".config(enabled = platform != Platform.Native) {
+    checkAll(Arb.json(Arb.city())) { cityJson ->
+      JsonPath.path("streets[0]")
+        .extract(Street.serializer())
+        .getOrNull(cityJson) shouldBe Json.decodeFromJsonElement(City.serializer(), cityJson).streets.getOrNull(0)
+    }
+  }
+
+  "get all elements from array".config(enabled = platform != Platform.Native) {
+    checkAll(Arb.json(Arb.city())) { cityJson ->
+      JsonPath.select("streets").selectEvery("*").select("name")
+        .string
+        .getAll(cityJson) shouldBe Json.decodeFromJsonElement(City.serializer(), cityJson).streets.map { it.name }
+    }
+  }
+
+  "get all elements from array, using path".config(enabled = platform != Platform.Native) {
+    checkAll(Arb.json(Arb.city())) { cityJson ->
+      JsonPath.pathEvery("streets.*.name")
+        .string
+        .getAll(cityJson) shouldBe Json.decodeFromJsonElement(City.serializer(), cityJson).streets.map { it.name }
     }
   }
 })
