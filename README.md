@@ -9,7 +9,7 @@ Simply add the following dependency as `implementation` in the `build.gradle` de
 
 ```groovy
 dependencies {
-  implementation("io.github.nomisrev:kotlinx-serialization-jsonpath:0.1.0")
+  implementation("io.github.nomisrev:kotlinx-serialization-jsonpath:0.2.0")
 }
 ```
 

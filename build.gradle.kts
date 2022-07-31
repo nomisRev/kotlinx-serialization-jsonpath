@@ -35,8 +35,6 @@ buildscript {
 
 apply(plugin = "kotlinx-knit")
 
-version "1.0"
-
 repositories {
   mavenCentral()
 }
