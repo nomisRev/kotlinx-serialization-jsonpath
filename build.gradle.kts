@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import kotlinx.kover.api.KoverTaskExtension
+import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
@@ -44,14 +45,15 @@ allprojects {
   group = property("projects.group").toString()
   version = property("projects.version").toString()
   setupDetekt()
-
+  
+  java {
+    sourceCompatibility = VERSION_1_8
+    targetCompatibility = VERSION_1_8
+  }
+  
   tasks {
     withType<KotlinCompile>().configureEach {
-      kotlinOptions {
-        jvmTarget = "1.8"
-      }
-      sourceCompatibility = "1.8"
-      targetCompatibility = "1.8"
+      kotlinOptions.jvmTarget = "1.8"
     }
 
     withType<Test>().configureEach {

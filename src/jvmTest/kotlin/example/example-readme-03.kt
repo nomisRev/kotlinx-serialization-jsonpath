@@ -1,4 +1,5 @@
 // This file was automatically generated from README.md by Knit tool. Do not edit.
+@file:Suppress("InvalidPackageDeclaration")
 package com.example.exampleReadme03
 
 import kotlinx.serialization.*

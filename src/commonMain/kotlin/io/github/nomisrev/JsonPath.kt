@@ -1,4 +1,4 @@
-@file:Suppress("TooManyFunctions", "InvalidPackageDeclaration")
+@file:Suppress("TooManyFunctions")
 package io.github.nomisrev
 
 import arrow.core.Option
