@@ -1,5 +1,5 @@
 // This file was automatically generated from README.md by Knit tool. Do not edit.
-@file:Suppress("MaxLineLength")
+@file:Suppress("MaxLineLength", "InvalidPackageDeclaration")
 
 package com.example.test
 
