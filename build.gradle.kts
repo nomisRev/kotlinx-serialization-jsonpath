@@ -152,6 +152,9 @@ fun Project.setupDetekt() {
         txt.required by false
         xml.required by false
       }
+      
+      exclude("**/example/**")
+      exclude("**/ReadMeSpec.kt")
     }
 
     configureEach {
