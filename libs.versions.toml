@@ -1,6 +1,6 @@
 [versions]
 arrow = "1.2.1"
-arrowGradleConfig = "0.11.0"
+arrowGradle = "0.12.0-rc.5"
 coroutines = "1.7.3"
 dokka = "1.9.0"
 kotlin = "1.9.10"
@@ -30,11 +30,11 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-knit-test = { module = "org.jetbrains.kotlinx:kotlinx-knit-test", version.ref = "kotlinx-knit" }
 
 [plugins]
-arrow-formatter = { id = "io.arrow-kt.arrow-gradle-config-formatter", version.ref = "arrowGradleConfig" }
-arrow-kotlin = { id = "io.arrow-kt.arrow-gradle-config-kotlin", version.ref = "arrowGradleConfig" }
-arrow-nexus = { id = "io.arrow-kt.arrow-gradle-config-nexus", version.ref = "arrowGradleConfig" }
-arrow-publish = { id = "io.arrow-kt.arrow-gradle-config-publish", version.ref = "arrowGradleConfig" }
-arrow-versioning = { id = "io.arrow-kt.arrow-gradle-config-versioning", version.ref = "arrowGradleConfig" }
+arrow-formatter = { id = "io.arrow-kt.arrow-gradle-config-formatter", version.ref = "arrowGradle" }
+arrow-kotlin = { id = "io.arrow-kt.arrow-gradle-config-kotlin", version.ref = "arrowGradle" }
+arrow-nexus = { id = "io.arrow-kt.arrow-gradle-config-nexus", version.ref = "arrowGradle" }
+arrow-publish = { id = "io.arrow-kt.arrow-gradle-config-publish", version.ref = "arrowGradle" }
+arrow-versioning = { id = "io.arrow-kt.arrow-gradle-config-versioning", version.ref = "arrowGradle" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 kotest-multiplatform = { id = "io.kotest.multiplatform", version.ref = "kotest-plugin" }

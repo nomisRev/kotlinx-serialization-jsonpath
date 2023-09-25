@@ -69,9 +69,6 @@ allprojects {
 
 tasks.test {
   useJUnitPlatform()
-  extensions.configure(KoverTaskExtension::class) {
-    includes.add("io.github.nomisrev.*")
-  }
 }
 
 kotlin {
