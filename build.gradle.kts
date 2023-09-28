@@ -30,6 +30,7 @@ buildscript {
   alias(libs.plugins.dokka)
   alias(libs.plugins.kover)
   alias(libs.plugins.kotlinx.serialization)
+  id("com.vanniktech.maven.publish") version "0.25.3"
 }
 
 apply(plugin = "kotlinx-knit")

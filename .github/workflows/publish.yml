@@ -52,4 +52,4 @@ jobs:
       - name: Publish final version
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: -Pversion=${{ inputs.version }} publishAllPublicationsToMavenCentral
+          arguments: -Pversion=${{ inputs.version }} publishAllPublicationsToMavenCentralRepository
