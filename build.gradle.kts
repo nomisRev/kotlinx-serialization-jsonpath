@@ -15,13 +15,7 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.dokka.gradle.DokkaTask
 
-buildscript {
-  dependencies {
-    classpath("org.jetbrains.kotlinx:kotlinx-knit:0.4.0")
-  }
-}
-
-@Suppress("DSL_SCOPE_VIOLATION") plugins {
+plugins {
   application
   alias(libs.plugins.kotlin.multiplatform)
   alias(libs.plugins.arrow.kotlin)
@@ -30,10 +24,9 @@ buildscript {
   alias(libs.plugins.dokka)
   alias(libs.plugins.kover)
   alias(libs.plugins.kotlinx.serialization)
-  id("com.vanniktech.maven.publish") version "0.25.3"
+  alias(libs.plugins.publish)
+  alias(libs.plugins.knit)
 }
-
-apply(plugin = "kotlinx-knit")
 
 repositories {
   mavenCentral()
@@ -133,10 +126,10 @@ tasks {
 
   withType<Detekt>().configureEach {
     reports {
-      html.required by true
-      sarif.required by true
-      txt.required by false
-      xml.required by false
+      html.required.set(true)
+      sarif.required.set(true)
+      txt.required.set(false)
+      xml.required.set(false)
     }
 
     exclude("**/example/**")
@@ -146,8 +139,4 @@ tasks {
   configureEach {
     if (name == "build") dependsOn(withType<Detekt>())
   }
-}
-
-infix fun <T> Property<T>.by(value: T) {
-  set(value)
 }
