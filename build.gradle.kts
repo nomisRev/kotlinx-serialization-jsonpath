@@ -39,35 +39,30 @@ repositories {
   mavenCentral()
 }
 
-allprojects {
-  extra.set("dokka.outputDirectory", rootDir.resolve("docs"))
-  group = property("projects.group").toString()
-  version = property("projects.version").toString()
-  setupDetekt()
-  
-  java {
-    sourceCompatibility = VERSION_1_8
-    targetCompatibility = VERSION_1_8
-  }
-  
-  tasks {
-    withType<KotlinCompile>().configureEach {
-      kotlinOptions.jvmTarget = "1.8"
-    }
+group = property("projects.group").toString()
 
-    withType<Test>().configureEach {
-      maxParallelForks = Runtime.getRuntime().availableProcessors()
-      useJUnitPlatform()
-      testLogging {
-        exceptionFormat = TestExceptionFormat.FULL
-        events = setOf(PASSED, SKIPPED, FAILED, STANDARD_OUT, STANDARD_ERROR)
-      }
-    }
-  }
+java {
+  sourceCompatibility = VERSION_1_8
+  targetCompatibility = VERSION_1_8
 }
 
-tasks.test {
-  useJUnitPlatform()
+tasks {
+  withType<KotlinCompile>().configureEach {
+    kotlinOptions.jvmTarget = "1.8"
+  }
+
+  withType<Test>().configureEach {
+    maxParallelForks = Runtime.getRuntime().availableProcessors()
+    useJUnitPlatform()
+    testLogging {
+      exceptionFormat = TestExceptionFormat.FULL
+      events = setOf(PASSED, SKIPPED, FAILED, STANDARD_OUT, STANDARD_ERROR)
+    }
+  }
+
+  test {
+    useJUnitPlatform()
+  }
 }
 
 kotlin {
@@ -101,6 +96,12 @@ configure<KnitPluginExtension> {
   siteRoot = "https://nomisrev.github.io/kotlinx-serialization-jsonpath/"
 }
 
+configure<DetektExtension> {
+  parallel = true
+  buildUponDefaultConfig = true
+  allRules = true
+}
+
 tasks {
   withType<DokkaTask>().configureEach {
     outputDirectory.set(rootDir.resolve("docs"))
@@ -123,39 +124,27 @@ tasks {
   }
 
   getByName("knitPrepare").dependsOn(getTasksByName("dokka", true))
-  
+
   register<Delete>("cleanDocs") {
     val folder = file("docs").also { it.mkdir() }
     val docsContent = folder.listFiles().filter { it != folder }
     delete(docsContent)
   }
-}
 
-fun Project.setupDetekt() {
-  plugins.apply("io.gitlab.arturbosch.detekt")
+  withType<Detekt>().configureEach {
+    reports {
+      html.required by true
+      sarif.required by true
+      txt.required by false
+      xml.required by false
+    }
 
-  configure<DetektExtension> {
-    parallel = true
-    buildUponDefaultConfig = true
-    allRules = true
+    exclude("**/example/**")
+    exclude("**/ReadMeSpec.kt")
   }
 
-  tasks {
-    withType<Detekt>().configureEach {
-      reports {
-        html.required by true
-        sarif.required by true
-        txt.required by false
-        xml.required by false
-      }
-      
-      exclude("**/example/**")
-      exclude("**/ReadMeSpec.kt")
-    }
-
-    configureEach {
-      if (name == "build") dependsOn(withType<Detekt>())
-    }
+  configureEach {
+    if (name == "build") dependsOn(withType<Detekt>())
   }
 }
 
