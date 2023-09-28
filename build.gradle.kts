@@ -24,8 +24,6 @@ buildscript {
 @Suppress("DSL_SCOPE_VIOLATION") plugins {
   application
   alias(libs.plugins.kotlin.multiplatform)
-  alias(libs.plugins.arrow.publish)
-  alias(libs.plugins.arrow.nexus)
   alias(libs.plugins.arrow.kotlin)
   alias(libs.plugins.kotest.multiplatform)
   alias(libs.plugins.detekt)
@@ -162,13 +160,4 @@ fun Project.setupDetekt() {
 
 infix fun <T> Property<T>.by(value: T) {
   set(value)
-}
-
-nexusPublishing {
-  repositories {
-    named("sonatype") {
-      nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-      snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-    }
-  }
 }
