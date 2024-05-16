@@ -2,12 +2,11 @@
 @file:Suppress("InvalidPackageDeclaration")
 package com.example.exampleReadme04
 
-import arrow.optics.Every
-import io.github.nomisrev.JsonPath
-import io.github.nomisrev.pathEvery
-import io.github.nomisrev.string
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
+import arrow.optics.*
+import io.github.nomisrev.*
+import arrow.optics.typeclasses.*
 
 private const val JSON_STRING = """
     {
@@ -31,9 +30,10 @@ private const val JSON_STRING = """
       ]
     }"""
 
-fun main() {
+fun main(): Unit {
+
   val json: JsonElement = Json.decodeFromString(JSON_STRING)
-  val employeesName: Every<JsonElement, String> = JsonPath.pathEvery("employees.*.name").string
+  val employeesName: Traversal<JsonElement, String> = JsonPath.pathEvery("employees.*.name").string
   val res: JsonElement = employeesName.modify(json, String::uppercase).also(::println)
   employeesName.getAll(res).also(::println)
 }

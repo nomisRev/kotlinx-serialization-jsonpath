@@ -33,7 +33,7 @@ private const val JSON_STRING = """
 fun main(): Unit {
 
   val json: JsonElement = Json.decodeFromString(JSON_STRING)
-  val employeesName: Every<JsonElement, String> = JsonPath.select("employees").every.select("name").string
+  val employeesName: Traversal<JsonElement, String> = JsonPath.select("employees").every.select("name").string
   val res: JsonElement = employeesName.modify(json, String::uppercase).also(::println)
   employeesName.getAll(res).also(::println)
 }

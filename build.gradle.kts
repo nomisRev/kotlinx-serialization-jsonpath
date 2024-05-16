@@ -2,23 +2,22 @@ import kotlinx.knit.KnitPluginExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
-import kotlinx.kover.api.KoverTaskExtension
-import org.gradle.api.JavaVersion.VERSION_1_8
-import org.gradle.api.Project
+import org.gradle.api.JavaVersion.VERSION_11
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
-import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR
 import org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
   application
-  alias(libs.plugins.kotlin.multiplatform)
-  alias(libs.plugins.arrow.kotlin)
+  alias(libs.plugins.kotlin)
+  alias(libs.plugins.spotless)
   alias(libs.plugins.kotest.multiplatform)
   alias(libs.plugins.detekt)
   alias(libs.plugins.dokka)
@@ -32,16 +31,20 @@ repositories {
   mavenCentral()
 }
 
-group = property("projects.group").toString()
+spotless {
+  kotlin {
+    ktfmt().googleStyle()
+  }
+}
 
 java {
-  sourceCompatibility = VERSION_1_8
-  targetCompatibility = VERSION_1_8
+  sourceCompatibility = VERSION_11
+  targetCompatibility = VERSION_11
 }
 
 tasks {
   withType<KotlinCompile>().configureEach {
-    kotlinOptions.jvmTarget = "1.8"
+    this.compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
   }
 
   withType<Test>().configureEach {
@@ -49,7 +52,7 @@ tasks {
     useJUnitPlatform()
     testLogging {
       exceptionFormat = TestExceptionFormat.FULL
-      events = setOf(PASSED, SKIPPED, FAILED, STANDARD_OUT, STANDARD_ERROR)
+      events = setOf(SKIPPED, FAILED, STANDARD_OUT, STANDARD_ERROR)
     }
   }
 
@@ -59,10 +62,36 @@ tasks {
 }
 
 kotlin {
+  explicitApi()
+
+  jvm()
+  js(IR) {
+    browser()
+    nodejs()
+  }
+
+  @OptIn(ExperimentalWasmDsl::class)
+  wasmJs()
+  linuxX64()
+  macosX64()
+  macosArm64()
+  iosSimulatorArm64()
+  iosX64()
+  linuxArm64()
+  watchosSimulatorArm64()
+  watchosX64()
+  watchosArm32()
+  watchosArm64()
+  tvosSimulatorArm64()
+  tvosX64()
+  tvosArm64()
+  iosArm64()
+  mingwX64()
+
   sourceSets {
     commonMain {
       dependencies {
-        implementation(kotlin("stdlib-common"))
+        implementation(kotlin("stdlib"))
         api(libs.arrow.optics)
         api(libs.kotlinx.serialization.json)
       }
@@ -117,12 +146,6 @@ tasks {
   }
 
   getByName("knitPrepare").dependsOn(getTasksByName("dokka", true))
-
-  register<Delete>("cleanDocs") {
-    val folder = file("docs").also { it.mkdir() }
-    val docsContent = folder.listFiles().filter { it != folder }
-    delete(docsContent)
-  }
 
   withType<Detekt>().configureEach {
     reports {

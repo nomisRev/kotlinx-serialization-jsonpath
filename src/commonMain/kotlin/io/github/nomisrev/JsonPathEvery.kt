@@ -4,7 +4,7 @@ package io.github.nomisrev
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.optics.Every
+import arrow.optics.Traversal
 import arrow.optics.Optional
 import arrow.optics.typeclasses.At
 import arrow.optics.typeclasses.FilterIndex
@@ -18,46 +18,46 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.serializer
 
 /** Extract a [Boolean] value from a [JsonElement] */
-public inline val Every<JsonElement, JsonElement>.boolean: Every<JsonElement, Boolean>
+public inline val Traversal<JsonElement, JsonElement>.boolean: Traversal<JsonElement, Boolean>
   inline get() = this@boolean compose Optional.jsonBoolean()
 
 /** Extract a [String] value from a [JsonElement] */
-public inline val Every<JsonElement, JsonElement>.string: Every<JsonElement, String>
+public inline val Traversal<JsonElement, JsonElement>.string: Traversal<JsonElement, String>
   inline get() = this compose Optional.jsonString()
 
 /** Extract a [Double] value from a [JsonElement] */
-public inline val Every<JsonElement, JsonElement>.double: Every<JsonElement, Double>
+public inline val Traversal<JsonElement, JsonElement>.double: Traversal<JsonElement, Double>
   inline get() = this compose Optional.jsonDouble()
 
 /** Extract a [Float] value from a [JsonElement] */
-public inline val Every<JsonElement, JsonElement>.float: Every<JsonElement, Float>
+public inline val Traversal<JsonElement, JsonElement>.float: Traversal<JsonElement, Float>
   inline get() = this compose Optional.jsonFloat()
 
 /** Extract a [Long] value from a [JsonElement] */
-public inline val Every<JsonElement, JsonElement>.long: Every<JsonElement, Long>
+public inline val Traversal<JsonElement, JsonElement>.long: Traversal<JsonElement, Long>
   inline get() = this compose Optional.jsonLong()
 
 /** Extract a [Int] value from a [JsonElement] */
-public inline val Every<JsonElement, JsonElement>.int: Every<JsonElement, Int>
+public inline val Traversal<JsonElement, JsonElement>.int: Traversal<JsonElement, Int>
   inline get() = this compose Optional.jsonInt()
 
 /** Extract a [List] of [JsonElement] from a [JsonElement] */
-public inline val Every<JsonElement, JsonElement>.array: Every<JsonElement, List<JsonElement>>
+public inline val Traversal<JsonElement, JsonElement>.array: Traversal<JsonElement, List<JsonElement>>
   inline get() = this compose Optional.jsonArray()
 
 /** Extract a [Map] of [String] to [JsonElement] from a [JsonElement] */
 @Suppress("TopLevelPropertyNaming")
-public inline val Every<JsonElement, JsonElement>.`object`: Every<JsonElement, Map<String, JsonElement>>
+public inline val Traversal<JsonElement, JsonElement>.`object`: Traversal<JsonElement, Map<String, JsonElement>>
   inline get() = this compose Optional.jsonObject()
 
 /** Extract `null` from a [JsonElement] */
 @Suppress("TopLevelPropertyNaming")
-public inline val Every<JsonElement, JsonElement>.`null`: Every<JsonElement, JsonNull>
+public inline val Traversal<JsonElement, JsonElement>.`null`: Traversal<JsonElement, JsonNull>
   inline get() = this compose Optional.jsonNull()
 
 /** Select _every_ entry in [JsonArray] and [JsonObject] */
-public inline val Every<JsonElement, JsonElement>.every: Every<JsonElement, JsonElement>
-  inline get() = this compose Every.jsonElement()
+public inline val Traversal<JsonElement, JsonElement>.every: Traversal<JsonElement, JsonElement>
+  inline get() = this compose Traversal.jsonElement()
 
 /**
  * Select value at [selector]. The following syntax is supported for [selector]:
@@ -65,7 +65,7 @@ public inline val Every<JsonElement, JsonElement>.every: Every<JsonElement, Json
  * - `['field']`: select the property with that name,
  * - `[i]`, where `i` is a number: select the index in an array.
  */
-public fun Every<JsonElement, JsonElement>.select(selector: String): Every<JsonElement, JsonElement> {
+public fun Traversal<JsonElement, JsonElement>.select(selector: String): Traversal<JsonElement, JsonElement> {
   val inBrackets = matchNameInBrackets(selector)
   val ix = matchIndexInBrackets(selector)
   return when {
@@ -85,16 +85,16 @@ public fun Every<JsonElement, JsonElement>.select(selector: String): Every<JsonE
  * - `[start:end]`: select the indices from `start` to (but not including) `end`,
  * - `[start:]`: select the indices from `start` to the end of the array.
  */
-public fun Every<JsonElement, JsonElement>.selectEvery(
+public fun Traversal<JsonElement, JsonElement>.selectEvery(
   selector: String
-): Every<JsonElement, JsonElement> {
+): Traversal<JsonElement, JsonElement> {
   val inBrackets = matchNameInBrackets(selector)
   val ixs = matchIndicesInBrackets(selector)
   val startIx = matchStartIndex(selector)
   val startEndIx = matchStartEndIndex(selector)
   return when {
     inBrackets != null -> get(inBrackets)
-    selector == "*" -> this compose Every.jsonElement() // inline definition of [every]
+    selector == "*" -> this compose Traversal.jsonElement() // inline definition of [every]
     ixs != null -> filterIndex { it in ixs }
     startIx != null -> filterIndex { it >= startIx }
     startEndIx != null -> get(startEndIx.first until startEndIx.second)
@@ -109,11 +109,11 @@ public fun Every<JsonElement, JsonElement>.selectEvery(
  * JsonPath.path("addresses[0].street.name")
  * ```
  */
-public fun Every<JsonElement, JsonElement>.path(
+public fun Traversal<JsonElement, JsonElement>.path(
   path: String,
   fieldDelimiter: String = ".",
   indexDelimiter: String = "["
-): Every<JsonElement, JsonElement> =
+): Traversal<JsonElement, JsonElement> =
   path.splitTwice(fieldDelimiter, indexDelimiter).fold(this) { acc, pathSelector -> acc.select(pathSelector) }
 
 /**
@@ -123,11 +123,11 @@ public fun Every<JsonElement, JsonElement>.path(
  * JsonPath.path("addresses[0].*.street.name")
  * ```
  */
-public fun Every<JsonElement, JsonElement>.pathEvery(
+public fun Traversal<JsonElement, JsonElement>.pathEvery(
   path: String,
   fieldDelimiter: String = ".",
   indexDelimiter: String = "["
-): Every<JsonElement, JsonElement> =
+): Traversal<JsonElement, JsonElement> =
   path.splitTwice(fieldDelimiter, indexDelimiter).fold(this) { acc, pathSelector -> acc.selectEvery(pathSelector) }
 
 /**
@@ -135,41 +135,43 @@ public fun Every<JsonElement, JsonElement>.pathEvery(
  * This allows you to erase the value by setting it to [None],
  * or allows you to overwrite it by setting a new [Some].
  */
-public fun Every<JsonElement, JsonElement>.at(
+public fun Traversal<JsonElement, JsonElement>.at(
   name: String
-): Every<JsonElement, Option<JsonElement>> =
+): Traversal<JsonElement, Option<JsonElement>> =
   `object` compose At.map<String, JsonElement>().at(name)
 
 /** Select keys out of an [JsonObject] with the given [predicate] */
-public fun Every<JsonElement, JsonElement>.filterKeys(
+public fun Traversal<JsonElement, JsonElement>.filterKeys(
   predicate: (keys: String) -> Boolean
-): Every<JsonElement, JsonElement> =
+): Traversal<JsonElement, JsonElement> =
   `object` compose FilterIndex.map<String, JsonElement>().filter(predicate)
 
 /** Select a [property] out of a [JsonObject] */
-public operator fun Every<JsonElement, JsonElement>.get(property: String): Every<JsonElement, JsonElement> =
+public operator fun Traversal<JsonElement, JsonElement>.get(property: String): Traversal<JsonElement, JsonElement> =
   `object` compose Index.map<String, JsonElement>().index(property)
 
 /** Select an [index] out of a [JsonArray] */
-public operator fun Every<JsonElement, JsonElement>.get(index: Int): Every<JsonElement, JsonElement> =
+public operator fun Traversal<JsonElement, JsonElement>.get(index: Int): Traversal<JsonElement, JsonElement> =
   array compose Index.list<JsonElement>().index(index)
 
 /** Select all indices from the [range] out of a [JsonArray] */
-public operator fun Every<JsonElement, JsonElement>.get(range: ClosedRange<Int>): Every<JsonElement, JsonElement> =
+public operator fun Traversal<JsonElement, JsonElement>.get(
+  range: ClosedRange<Int>
+): Traversal<JsonElement, JsonElement> =
   filterIndex { it in range }
 
 /** Select an indices out of a [JsonArray] with the given [predicate] */
-public fun Every<JsonElement, JsonElement>.filterIndex(
+public fun Traversal<JsonElement, JsonElement>.filterIndex(
   predicate: (index: Int) -> Boolean
-): Every<JsonElement, JsonElement> = array compose FilterIndex.list<JsonElement>().filter(predicate)
+): Traversal<JsonElement, JsonElement> = array compose FilterIndex.list<JsonElement>().filter(predicate)
 
 /** Extract a value of type [A] with an _implicit_ KotlinX Serializer */
-public inline fun <reified A> Every<JsonElement, JsonElement>.extract(
+public inline fun <reified A> Traversal<JsonElement, JsonElement>.extract(
   parser: Json = Json
-): Every<JsonElement, A> = extract(serializer(), parser)
+): Traversal<JsonElement, A> = extract(serializer(), parser)
 
 /** Extract a value of type [A] given a [KSerializer] for [A] */
-public fun <A> Every<JsonElement, JsonElement>.extract(
+public fun <A> Traversal<JsonElement, JsonElement>.extract(
   serializer: KSerializer<A>,
   parser: Json = Json
-): Every<JsonElement, A> = this compose parse(serializer, parser)
+): Traversal<JsonElement, A> = this compose parse(serializer, parser)

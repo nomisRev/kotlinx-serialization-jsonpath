@@ -2,21 +2,20 @@
 
 package io.github.nomisrev
 
-import arrow.core.Either
-import arrow.core.Option
-import arrow.core.foldLeft
 import arrow.core.left
 import arrow.core.right
+import arrow.core.Option
 import arrow.core.toOption
-import arrow.optics.Every
+import arrow.core.Either
+import arrow.core.fold
+import arrow.optics.Prism
 import arrow.optics.Lens
 import arrow.optics.Optional
-import arrow.optics.PEvery
 import arrow.optics.POptional
-import arrow.optics.Prism
+import arrow.optics.Traversal
+import arrow.optics.PTraversal
 import arrow.optics.typeclasses.At
 import arrow.optics.typeclasses.Index
-import arrow.typeclasses.Monoid
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -48,20 +47,20 @@ public fun POptional.Companion.jsonNull(): Optional<JsonElement, JsonNull> = Jso
 public fun POptional.Companion.jsonArray(): Optional<JsonElement, List<JsonElement>> =
   JsonElementToJsonArray
 
-public fun PEvery.Companion.jsonArray(): Every<JsonArray, JsonElement> = JsArrayEvery
+public fun PTraversal.Companion.jsonArray(): Traversal<JsonArray, JsonElement> = JsArrayTraversal
 
 public fun Index.Companion.jsonArray(): Index<JsonArray, Int, JsonElement> = JsArrayIndex
 
 public fun POptional.Companion.jsonObject(): Optional<JsonElement, Map<String, JsonElement>> =
   JsonElementToJsonObject
 
-public fun PEvery.Companion.jsonObject(): Every<JsonObject, JsonElement> = JsonObjectEvery
+public fun PTraversal.Companion.jsonObject(): Traversal<JsonObject, JsonElement> = JsonObjectTraversal
 
 public fun Index.Companion.jsonObject(): Index<JsonObject, String, JsonElement> = JsonObjectIndex
 
 public fun At.Companion.jsonObject(): At<JsonObject, String, Option<JsonElement>> = JsonObjectAt
 
-public fun PEvery.Companion.jsonElement(): Every<JsonElement, JsonElement> = JsonElementEvery
+public fun PTraversal.Companion.jsonElement(): Traversal<JsonElement, JsonElement> = JsonElementTraversal
 
 private object JsonObjectIndex : Index<JsonObject, String, JsonElement> {
   override fun index(i: String): Optional<JsonObject, JsonElement> =
@@ -81,17 +80,17 @@ private object JsonObjectAt : At<JsonObject, String, Option<JsonElement>> {
     )
 }
 
-private object JsonObjectEvery : Every<JsonObject, JsonElement> {
+private object JsonObjectTraversal : Traversal<JsonObject, JsonElement> {
   override fun modify(source: JsonObject, map: (focus: JsonElement) -> JsonElement): JsonObject =
     JsonObject(source.mapValues { (_, focus) -> map(focus) })
 
-  override fun <R> foldMap(M: Monoid<R>, source: JsonObject, map: (focus: JsonElement) -> R): R =
-    with(M) { source.foldLeft(empty()) { acc, (_, focus) -> acc.combine(map(focus)) } }
+  override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: JsonObject, map: (focus: JsonElement) -> R): R =
+    source.fold(initial) { acc, (_, focus) -> combine(acc, map(focus)) }
 }
 
-private object JsArrayEvery : Every<JsonArray, JsonElement> {
-  override fun <R> foldMap(M: Monoid<R>, source: JsonArray, map: (focus: JsonElement) -> R): R =
-    with(M) { source.fold(empty()) { acc, json -> acc.combine(map(json)) } }
+private object JsArrayTraversal : Traversal<JsonArray, JsonElement> {
+  override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: JsonArray, map: (focus: JsonElement) -> R): R =
+    source.fold(initial) { acc, json -> combine(acc, map(json)) }
 
   override fun modify(source: JsonArray, map: (focus: JsonElement) -> JsonElement): JsonArray =
     JsonArray(source.map(map))
@@ -217,15 +216,15 @@ private object JsonElementToJsonObject : Optional<JsonElement, Map<String, JsonE
     (source as? JsonObject)?.let { JsonObject(focus) } ?: source
 }
 
-private object JsonElementEvery : Every<JsonElement, JsonElement> {
-  override fun <R> foldMap(M: Monoid<R>, source: JsonElement, map: (focus: JsonElement) -> R): R =
-    with(M) {
-      when (source) {
-        JsonNull -> map(JsonNull)
-        is JsonObject -> source.foldLeft(empty()) { acc, (_, focus) -> acc.combine(map(focus)) }
-        is JsonArray -> source.fold(empty()) { acc, json -> acc.combine(map(json)) }
-        is JsonPrimitive -> map(source)
-      }
+private object JsonElementTraversal : Traversal<JsonElement, JsonElement> {
+  override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: JsonElement, map: (focus: JsonElement) -> R): R =
+    when (source) {
+      JsonNull -> map(JsonNull)
+      is JsonObject ->
+        source.fold(initial) { acc, (_, focus) -> combine(acc, map(focus)) }
+
+      is JsonArray -> source.fold(initial) { acc, json -> combine(acc, map(json)) }
+      is JsonPrimitive -> map(source)
     }
 
   override fun modify(source: JsonElement, map: (focus: JsonElement) -> JsonElement): JsonElement =
