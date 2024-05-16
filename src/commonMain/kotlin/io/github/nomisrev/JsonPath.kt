@@ -4,8 +4,8 @@ package io.github.nomisrev
 import arrow.core.Option
 import arrow.core.None
 import arrow.core.Some
-import arrow.optics.Every
 import arrow.optics.Optional
+import arrow.optics.Traversal
 import arrow.optics.typeclasses.At
 import arrow.optics.typeclasses.Index
 import arrow.optics.typeclasses.FilterIndex
@@ -21,7 +21,6 @@ import kotlinx.serialization.serializer
  * Starting point of the JsonPath DSL
  * This represents the _root_ of the path you want to define in your `JsonElement`
  */
-@Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
 public object JsonPath : Optional<JsonElement, JsonElement> by Optional.id()
 
 /** Extract a [Boolean] value from a [JsonElement] */
@@ -63,8 +62,8 @@ public inline val Optional<JsonElement, JsonElement>.`null`: Optional<JsonElemen
   inline get() = this composeOptional Optional.jsonNull()
 
 /** Select _every_ entry in [JsonArray] and [JsonObject] */
-public inline val Optional<JsonElement, JsonElement>.every: Every<JsonElement, JsonElement>
-  inline get() = this compose Every.jsonElement()
+public inline val Optional<JsonElement, JsonElement>.every: Traversal<JsonElement, JsonElement>
+  inline get() = this compose Traversal.jsonElement()
 
 /**
  * Select value at [selector]. The following syntax is supported for [selector]:
@@ -96,14 +95,14 @@ public fun Optional<JsonElement, JsonElement>.select(
  */
 public fun Optional<JsonElement, JsonElement>.selectEvery(
   selector: String
-): Every<JsonElement, JsonElement> {
+): Traversal<JsonElement, JsonElement> {
   val inBrackets = matchNameInBrackets(selector)
   val ixs = matchIndicesInBrackets(selector)
   val startIx = matchStartIndex(selector)
   val startEndIx = matchStartEndIndex(selector)
   return when {
     inBrackets != null -> get(inBrackets)
-    selector == "*" -> this compose Every.jsonElement() // inline definition of [every]
+    selector == "*" -> this compose Traversal.jsonElement() // inline definition of [every]
     ixs != null -> filterIndex { it in ixs }
     startIx != null -> filterIndex { it >= startIx }
     startEndIx != null -> get(startEndIx.first until startEndIx.second)
@@ -136,9 +135,9 @@ public fun Optional<JsonElement, JsonElement>.pathEvery(
   path: String,
   fieldDelimiter: String = ".",
   indexDelimiter: String = "["
-): Every<JsonElement, JsonElement> =
+): Traversal<JsonElement, JsonElement> =
   path.splitTwice(fieldDelimiter, indexDelimiter).fold(this) {
-      acc: Every<JsonElement, JsonElement>, pathSelector -> acc.selectEvery(pathSelector)
+      acc: Traversal<JsonElement, JsonElement>, pathSelector -> acc.selectEvery(pathSelector)
   }
 
 /**
@@ -154,7 +153,7 @@ public fun Optional<JsonElement, JsonElement>.at(
 /** Select keys out of an [JsonObject] with the given [predicate] */
 public fun Optional<JsonElement, JsonElement>.filterKeys(
   predicate: (keys: String) -> Boolean
-): Every<JsonElement, JsonElement> =
+): Traversal<JsonElement, JsonElement> =
   `object` compose FilterIndex.map<String, JsonElement>().filter(predicate)
 
 /** Select a [property] out of a [JsonObject] */
@@ -172,13 +171,13 @@ public operator fun Optional<JsonElement, JsonElement>.get(
 /** Select all indices from the [range] out of a [JsonArray] */
 public operator fun Optional<JsonElement, JsonElement>.get(
   range: ClosedRange<Int>
-): Every<JsonElement, JsonElement> =
+): Traversal<JsonElement, JsonElement> =
   filterIndex { it in range }
 
 /** Select an indices out of a [JsonArray] with the given [predicate] */
 public fun Optional<JsonElement, JsonElement>.filterIndex(
   predicate: (index: Int) -> Boolean
-): Every<JsonElement, JsonElement> =
+): Traversal<JsonElement, JsonElement> =
   array compose FilterIndex.list<JsonElement>().filter(predicate)
 
 /** Extract a value of type [A] with an _implicit_ KotlinX Serializer */

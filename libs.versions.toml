@@ -1,25 +1,19 @@
 [versions]
-arrow = "1.2.1"
+arrow = "2.0.0-alpha.1"
 arrowGradle = "0.12.0-rc.6"
-coroutines = "1.7.3"
-dokka = "1.9.0"
-kotlin = "1.9.10"
-kotest = "5.7.2"
-kotest-plugin = "5.7.2"
-kover = "0.7.3"
+dokka = "1.9.20"
+kotlin = "2.0.0-RC3"
+kotest = "5.9.0"
+kover = "0.8.0"
 detekt = "1.23.1"
 kotest-arrow="1.4.0"
-kotlinx-json="1.6.0"
+kotlinx-json="1.6.3"
 kotlinx-knit="0.4.0"
-publish="0.25.3"
+publish="0.28.0"
 knit="0.4.0"
 
 [libraries]
-arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
 arrow-optics = { module = "io.arrow-kt:arrow-optics", version.ref = "arrow" }
-arrow-fx = { module = "io.arrow-kt:arrow-fx-coroutines", version.ref = "arrow" }
-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 dokka-core = { module = "org.jetbrains.dokka:dokka-core", version.ref = "dokka" }
 kotest-assertionsCore = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-frameworkEngine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
@@ -32,11 +26,10 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-knit-test = { module = "org.jetbrains.kotlinx:kotlinx-knit-test", version.ref = "kotlinx-knit" }
 
 [plugins]
-arrow-formatter = { id = "io.arrow-kt.arrow-gradle-config-formatter", version.ref = "arrowGradle" }
-arrow-kotlin = { id = "io.arrow-kt.arrow-gradle-config-kotlin", version.ref = "arrowGradle" }
+kotlin = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
-kotest-multiplatform = { id = "io.kotest.multiplatform", version.ref = "kotest-plugin" }
+kotest-multiplatform = { id = "io.kotest.multiplatform", version.ref = "kotest" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

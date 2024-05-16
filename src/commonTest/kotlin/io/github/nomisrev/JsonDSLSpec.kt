@@ -90,7 +90,7 @@ class JsonDSLSpec : StringSpec({
 
   "at from object" {
     checkAll(Arb.json(Arb.city())) { cityJson ->
-      JsonPath.at("streets").getOrNull(cityJson)?.orNull() shouldBe (cityJson as? JsonObject)?.get("streets")
+      JsonPath.at("streets").getOrNull(cityJson)?.getOrNull() shouldBe (cityJson as? JsonObject)?.get("streets")
     }
   }
 
