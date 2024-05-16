@@ -155,7 +155,9 @@ public operator fun Traversal<JsonElement, JsonElement>.get(index: Int): Travers
   array compose Index.list<JsonElement>().index(index)
 
 /** Select all indices from the [range] out of a [JsonArray] */
-public operator fun Traversal<JsonElement, JsonElement>.get(range: ClosedRange<Int>): Traversal<JsonElement, JsonElement> =
+public operator fun Traversal<JsonElement, JsonElement>.get(
+  range: ClosedRange<Int>
+): Traversal<JsonElement, JsonElement> =
   filterIndex { it in range }
 
 /** Select an indices out of a [JsonArray] with the given [predicate] */

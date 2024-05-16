@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 plugins {
   application
   alias(libs.plugins.kotlin)
+  alias(libs.plugins.spotless)
   alias(libs.plugins.kotest.multiplatform)
   alias(libs.plugins.detekt)
   alias(libs.plugins.dokka)
@@ -28,6 +29,12 @@ plugins {
 
 repositories {
   mavenCentral()
+}
+
+spotless {
+  kotlin {
+    ktfmt().googleStyle()
+  }
 }
 
 java {
