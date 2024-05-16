@@ -128,3 +128,36 @@ fun main(): Unit {
 {"name":"Arrow","address":{"city":"Functional Town","street":{"number":1337,"name":"Functional street"}},"employees":[{"name":"JOHN","lastName":"doe"},{"name":"JANE","lastName":"doe"}]}
 [JOHN, JANE]
 ```
+
+Alternatively we can also use the _pathEvery_ function to select _every_ `JsonElement` in our `JsonArray`.
+Like for _path_ we can also use the _dot (.) notation_ to select deeply nested properties.
+On the other hand, the _star (*) notation_ allow us to select _every_ `JsonElement` in our `JsonArray`. 
+
+Like before, below we select the _employees_ `JsonArray`,
+and then we select _every_ `JsonElement` in the `JsonArray`.
+We then _select_ the _name_ out of _every_ `JsonElement`.
+
+Again, instead of `Optional<JsonElement, String>` it now returns `Every<JsonElement, String>`,
+since we selected _many properties_ instead of a _single property_.
+
+You can then, apply a function to it using _modify_ like before.
+
+<!--- TEST -->
+
+<!--- INCLUDE
+fun main(): Unit {
+----- SUFFIX
+}
+-->
+```kotlin
+  val json: JsonElement = Json.decodeFromString(JSON_STRING)
+  val employeesName: Every<JsonElement, String> = JsonPath.pathEvery("employees.*.name").string
+  val res: JsonElement = employeesName.modify(json, String::uppercase).also(::println)
+  employeesName.getAll(res).also(::println)
+```
+> You can get the full code [here](src/jvmTest/kotlin/example/example-readme-03.kt).
+
+```text
+{"name":"Arrow","address":{"city":"Functional Town","street":{"number":1337,"name":"Functional street"}},"employees":[{"name":"JOHN","lastName":"doe"},{"name":"JANE","lastName":"doe"}]}
+[JOHN, JANE]
+```
