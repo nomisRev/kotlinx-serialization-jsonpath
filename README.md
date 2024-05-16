@@ -101,7 +101,7 @@ In the example below we select the _employees_ `JsonArray`,
 and then we select _every_ `JsonElement` in the `JsonArray`.
 We then _select_ the _name_ out of _every_ `JsonElement`.
 
-Instead of `Optional<JsonElement, String>` it now returns `Every<JsonElement, String>`,
+Instead of `Optional<JsonElement, String>` it now returns `Traversal<JsonElement, String>`,
 since we selected _many properties_ instead of a _single property_.
 
 Just like before we can apply a function to it using _modify_,
@@ -118,7 +118,7 @@ fun main(): Unit {
 -->
 ```kotlin
   val json: JsonElement = Json.decodeFromString(JSON_STRING)
-  val employeesName: Every<JsonElement, String> = JsonPath.select("employees").every.select("name").string
+  val employeesName: Traversal<JsonElement, String> = JsonPath.select("employees").every.select("name").string
   val res: JsonElement = employeesName.modify(json, String::uppercase).also(::println)
   employeesName.getAll(res).also(::println)
 ```
@@ -137,7 +137,7 @@ Like before, below we select the _employees_ `JsonArray`,
 and then we select _every_ `JsonElement` in the `JsonArray`.
 We then _select_ the _name_ out of _every_ `JsonElement`.
 
-Again, instead of `Optional<JsonElement, String>` it now returns `Every<JsonElement, String>`,
+Again, instead of `Optional<JsonElement, String>` it now returns `Traversal<JsonElement, String>`,
 since we selected _many properties_ instead of a _single property_.
 
 You can then, apply a function to it using _modify_ like before.
@@ -151,11 +151,11 @@ fun main(): Unit {
 -->
 ```kotlin
   val json: JsonElement = Json.decodeFromString(JSON_STRING)
-  val employeesName: Every<JsonElement, String> = JsonPath.pathEvery("employees.*.name").string
+  val employeesName: Traversal<JsonElement, String> = JsonPath.pathEvery("employees.*.name").string
   val res: JsonElement = employeesName.modify(json, String::uppercase).also(::println)
   employeesName.getAll(res).also(::println)
 ```
-> You can get the full code [here](src/jvmTest/kotlin/example/example-readme-03.kt).
+> You can get the full code [here](src/jvmTest/kotlin/example/example-readme-04.kt).
 
 ```text
 {"name":"Arrow","address":{"city":"Functional Town","street":{"number":1337,"name":"Functional street"}},"employees":[{"name":"JOHN","lastName":"doe"},{"name":"JANE","lastName":"doe"}]}

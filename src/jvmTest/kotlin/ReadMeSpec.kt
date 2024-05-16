@@ -26,11 +26,4 @@ class ReadMeSpec : StringSpec({
       "[JOHN, JANE]"
     )
   }
-
-  "ExampleReadme04" {
-    captureOutput("ExampleReadme04") { com.example.exampleReadme04.main() }.verifyOutputLines(
-      "{\"name\":\"Arrow\",\"address\":{\"city\":\"Functional Town\",\"street\":{\"number\":1337,\"name\":\"Functional street\"}},\"employees\":[{\"name\":\"JOHN\",\"lastName\":\"doe\"},{\"name\":\"JANE\",\"lastName\":\"doe\"}]}",
-      "[JOHN, JANE]"
-    )
-  }
 })
