@@ -2,7 +2,7 @@
 arrow = "2.0.0-alpha.1"
 dokka = "1.9.20"
 kotlin = "2.0.0-RC3"
-kotest = "5.9.0"
+kotest = "6.0.0-LOCAL"
 kover = "0.8.0"
 detekt = "1.23.5"
 kotest-arrow="1.4.0"
