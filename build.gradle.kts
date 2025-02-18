@@ -12,10 +12,9 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
-  application
   alias(libs.plugins.kotlin)
   alias(libs.plugins.spotless)
   alias(libs.plugins.kotest.multiplatform)
@@ -33,7 +32,12 @@ repositories {
 
 spotless {
   kotlin {
-    ktfmt().googleStyle()
+    ktfmt().kotlinlangStyle().configure {
+      it.setBlockIndent(2)
+      it.setContinuationIndent(2)
+      it.setRemoveUnusedImports(true)
+      it.setManageTrailingCommas(true)
+    }
   }
 }
 
@@ -54,9 +58,6 @@ tasks {
       exceptionFormat = TestExceptionFormat.FULL
       events = setOf(SKIPPED, FAILED, STANDARD_OUT, STANDARD_ERROR)
     }
-  }
-
-  test {
     useJUnitPlatform()
   }
 }
@@ -71,7 +72,11 @@ kotlin {
   }
 
   @OptIn(ExperimentalWasmDsl::class)
-  wasmJs()
+  wasmJs {
+    browser()
+    nodejs()
+    d8()
+  }
   linuxX64()
   macosX64()
   macosArm64()
