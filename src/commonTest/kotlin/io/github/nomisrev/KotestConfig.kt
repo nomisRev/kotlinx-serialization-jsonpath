@@ -17,6 +17,4 @@ object KotestConfig : AbstractProjectConfig() {
   override val testCaseOrder: TestCaseOrder =
     TestCaseOrder.Random
 
-
-
 }

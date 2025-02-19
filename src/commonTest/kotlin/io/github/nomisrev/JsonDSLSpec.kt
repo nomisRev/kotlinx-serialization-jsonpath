@@ -1,7 +1,5 @@
 package io.github.nomisrev
 
-import io.kotest.common.Platform
-import io.kotest.common.platform
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
@@ -99,16 +97,15 @@ class JsonDSLSpec : StringSpec({
       JsonPath.select("streets").getOrNull(cityJson) shouldBe (cityJson as? JsonObject)?.get("streets")
     }
   }
-
-  // See https://github.com/Kotlin/kotlinx.serialization/issues/1914
-  "extract from object".config(enabled = platform != Platform.Native) {
+  
+  "extract from object" {
     checkAll(Arb.json(Arb.city())) { cityJson ->
       JsonPath.extract(City.serializer())
         .getOrNull(cityJson) shouldBe Json.decodeFromJsonElement(City.serializer(), cityJson)
     }
   }
 
-  "get from array, using select and get".config(enabled = platform != Platform.Native) {
+  "get from array, using select and get" {
     checkAll(Arb.json(Arb.city())) { cityJson ->
       JsonPath.select("streets")[0]
         .extract(Street.serializer())
@@ -116,14 +113,14 @@ class JsonDSLSpec : StringSpec({
     }
   }
 
-  "get from array, using get".config(enabled = platform != Platform.Native) {
+  "get from array, using get" {
     checkAll(Arb.json(Arb.city())) { cityJson ->
       JsonPath["streets"][0]["name"].string
         .getOrNull(cityJson) shouldBe Json.decodeFromJsonElement(City.serializer(), cityJson).streets.getOrNull(0)?.name
     }
   }
 
-  "get from array, using get".config(enabled = platform != Platform.Native) {
+  "get from array, using get range" {
     checkAll(Arb.json(Arb.city())) { cityJson ->
       JsonPath["streets"][0..0]["name"].string
         .getAll(cityJson)
@@ -131,7 +128,7 @@ class JsonDSLSpec : StringSpec({
     }
   }
 
-  "get from array, using select with special syntax".config(enabled = platform != Platform.Native) {
+  "get from array, using select with special syntax" {
     checkAll(Arb.json(Arb.city())) { cityJson ->
       JsonPath.select("['streets']").select("[0]")
         .extract(Street.serializer())
@@ -139,7 +136,7 @@ class JsonDSLSpec : StringSpec({
     }
   }
 
-  "get from array, using path".config(enabled = platform != Platform.Native) {
+  "get from array, using path" {
     checkAll(Arb.json(Arb.city())) { cityJson ->
       JsonPath.path("streets[0]")
         .extract(Street.serializer())
@@ -147,7 +144,7 @@ class JsonDSLSpec : StringSpec({
     }
   }
 
-  "get all elements from array".config(enabled = platform != Platform.Native) {
+  "get all elements from array" {
     checkAll(Arb.json(Arb.city())) { cityJson ->
       JsonPath.select("streets").selectEvery("*").select("name")
         .string
@@ -155,7 +152,7 @@ class JsonDSLSpec : StringSpec({
     }
   }
 
-  "get all elements from array, using path".config(enabled = platform != Platform.Native) {
+  "get all elements from array, using path" {
     checkAll(Arb.json(Arb.city())) { cityJson ->
       JsonPath.pathEvery("streets.*.name")
         .string
