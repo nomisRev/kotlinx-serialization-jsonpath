@@ -1,7 +1,7 @@
 [versions]
 arrow = "2.0.1"
 dokka = "2.0.0"
-kotlin = "2.1.10"
+kotlin = "2.1.20-RC"
 kotest = "6.0.0.M2"
 kover = "0.9.1"
 detekt = "1.23.7"
