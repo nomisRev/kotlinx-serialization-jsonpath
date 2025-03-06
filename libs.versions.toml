@@ -8,7 +8,7 @@ detekt = "1.23.8"
 kotest-arrow="2.0.0"
 kotlinx-json="1.8.0"
 kotlinx-knit="0.5.0"
-publish="0.30.0"
+publish="0.31.0"
 knit="0.5.0"
 spotless="7.0.2"
 
