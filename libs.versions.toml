@@ -10,7 +10,7 @@ kotlinx-json="1.8.0"
 kotlinx-knit="0.5.0"
 publish="0.30.0"
 knit="0.5.0"
-spotless="7.0.2"
+spotless="8.10.2"
 
 [libraries]
 arrow-optics = { module = "io.arrow-kt:arrow-optics", version.ref = "arrow" }
