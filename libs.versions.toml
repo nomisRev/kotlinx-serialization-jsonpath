@@ -1,16 +1,16 @@
 [versions]
-arrow = "2.0.1"
-dokka = "2.0.0"
-kotlin = "2.1.10"
-kotest = "6.0.0.M2"
-kover = "0.9.1"
+arrow = "2.2.3"
+dokka = "2.2.0"
+kotlin = "2.4.20"
+kotest = "6.2.5"
+kover = "0.9.9"
 detekt = "1.23.8"
 kotest-arrow="2.0.0"
-kotlinx-json="1.8.0"
-kotlinx-knit="0.5.0"
-publish="0.30.0"
+kotlinx-json="1.11.0"
+kotlinx-knit="0.5.1"
+publish="0.37.0"
 knit="0.5.0"
-spotless="7.0.2"
+spotless="7.2.1"
 
 [libraries]
 arrow-optics = { module = "io.arrow-kt:arrow-optics", version.ref = "arrow" }
